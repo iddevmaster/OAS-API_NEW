@@ -1,0 +1,70 @@
+ALTER TABLE `app_user` ADD `user_prefrix` VARCHAR(24) NOT NULL AFTER `user_password`;
+
+4/12/2023
+ALTER TABLE `app_user_detail` ADD `user_village` VARCHAR(128) NOT NULL AFTER `user_address`;
+27/12/2023
+ALTER TABLE `app_exam_main` ADD `em_measure` INT(0) NOT NULL AFTER `em_time`;
+ALTER TABLE `app_exam_time` ADD `udp_date` DATETIME NOT NULL AFTER `user_id`;
+
+5/2/2024
+ALTER TABLE `app_course_lesson` DROP `course_id`;
+CREATE TABLE `oas`.`app_course_cluster` (`cct_id` VARCHAR(48) NOT NULL , `cs_id` INT NOT NULL COMMENT 'app_course_lesson.cs_id' , `course_id` INT NOT NULL COMMENT 'app_course.course_id' , PRIMARY KEY (`cct_id`)) ENGINE = InnoDB;
+ALTER TABLE `app_course_log` ADD `course_id` INT NOT NULL COMMENT 'app_course.course_id' AFTER `cs_id`;
+
+12/2/2024
+ALTER TABLE `app_course` ADD `is_complete` INT(1) NOT NULL DEFAULT '0' AFTER `course_description`;
+
+1/3/2024
+CREATE TABLE `oas`.`app_user_vrdls` (`id` INT NOT NULL AUTO_INCREMENT , `student_id` VARCHAR(64) NOT NULL , `user_id` INT NOT NULL COMMENT 'app_user.user_id ' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+2/3/2024
+CREATE TABLE `oas`.`app_course_group` (`cg_id` INT NOT NULL , `cg_name` VARCHAR(256) NOT NULL , `crt_date` DATETIME NOT NULL , `udp_date` DATETIME NOT NULL , `user_crt` INT NOT NULL COMMENT 'app_user.user_id ' , `user_udp` INT NOT NULL COMMENT 'app_user.user_id ' ) ENGINE = InnoDB;
+ALTER TABLE `app_course_group` CHANGE `cg_id` `cg_id` INT(11) NOT NULL AUTO_INCREMENT, add PRIMARY KEY (`cg_id`);
+ALTER TABLE `app_course_group` ADD `cancelled` INT(1) NOT NULL DEFAULT '1' AFTER `udp_date`;
+ALTER TABLE `app_course_lesson` ADD `cg_id` INT NOT NULL COMMENT 'app_course_group.cg_id' AFTER `user_udp`;
+5/3/2024
+ALTER TABLE `app_course` CHANGE `course_description` `course_description` VARCHAR(512) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+14/3/2024
+CREATE TABLE `oas`.`app_course_document` (`id` INT NOT NULL AUTO_INCREMENT , `cd_path` VARCHAR(128) NOT NULL , `cd_name` VARCHAR(128) NOT NULL , `course_id` INT NOT NULL COMMENT 'app_course.course_id' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+15/3/2024
+ALTER TABLE `app_course_lesson` CHANGE `cs_name` `cs_name` VARCHAR(512) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+25/3/2024
+CREATE TABLE `oas`.`app_course_condition` (`id` INT NOT NULL AUTO_INCREMENT , `cc_value_a` INT NOT NULL , `cc_value_b` INT NOT NULL , `cg_id` INT NOT NULL COMMENT 'app_course_group.cg_id' , `course_id` INT NOT NULL COMMENT 'app_course.course_id' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+27/3/2024
+ALTER TABLE `app_course` ADD `course_remark_a` VARCHAR(512) NOT NULL AFTER `course_description`, ADD `course_remark_b` VARCHAR(512) NOT NULL AFTER `course_remark_a`;
+11/4/2024
+ALTER TABLE `app_news` ADD `news_video` VARCHAR(128) NOT NULL AFTER `news_cover`;
+26/4/2024
+ALTER TABLE `app_course` CHANGE `course_description` `course_description` VARCHAR(1024) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;
+19/6/2024
+ALTER TABLE `app_exam_question` CHANGE `em_id` `course_id` INT(11) NOT NULL COMMENT 'app_course.course_id';
+ALTER TABLE `app_course_group` ADD `cg_amount_random` INT(3) NOT NULL DEFAULT '0' AFTER `cg_name`;
+ALTER TABLE `app_course_cluster` CHANGE `cs_id` `cg_id` INT(11) NOT NULL COMMENT 'app_course_group.cg_id';
+ALTER TABLE `app_course_cluster` ADD `cg_amount_random` INT(3) NOT NULL DEFAULT '0' AFTER `cg_id`;
+ALTER TABLE `app_exam_question` ADD `cg_id` INT NOT NULL COMMENT 'app_course_group.cg_id' AFTER `cancelled`;
+ALTER TABLE `app_exam_question` DROP `course_id`;
+ALTER TABLE `app_exam_cache` CHANGE `em_id` `course_id` INT(11) NOT NULL COMMENT 'app_course.course_id';
+ALTER TABLE `app_exam_main` ADD `course_id` INT NOT NULL COMMENT 'app_course. course_id' AFTER `user_udp`;
+ALTER TABLE `app_exam_choice` CHANGE `em_id` `cg_id` INT(11) NOT NULL COMMENT 'app_course_group.cg_id ';
+ALTER TABLE `app_exam_cache` ADD `cg_id` INT NOT NULL COMMENT 'app_course_group.cg_id' AFTER `eq_id`;
+ALTER TABLE `app_exam_result` CHANGE `em_id` `course_id` INT(11) NOT NULL COMMENT 'app_course.course_id';
+ALTER TABLE `app_exam_result` ADD `er_use_time` TIME NOT NULL AFTER `er_question_total`;
+ALTER TABLE `app_user` CHANGE `user_type` `user_type` INT(1) NOT NULL COMMENT '1 = Super Admin , 2 = Staff , 3 = People';
+ALTER TABLE `app_dlt_card` CHANGE `id` `id` VARCHAR(128) NOT NULL;
+ALTER TABLE `app_dlt_card` ADD `card_number` VARCHAR(64) NOT NULL AFTER `id`, ADD `issued_by` VARCHAR(64) NOT NULL AFTER `card_number`, ADD `full_name` VARCHAR(128) NOT NULL AFTER `issued_by`, ADD `address` VARCHAR(512) NOT NULL AFTER `full_name`;
+ALTER TABLE `app_dlt_card` ADD `user_create` INT NOT NULL COMMENT 'app_user.user_id' AFTER `user_id`;
+ALTER TABLE `app_course` ADD `active` INT(1) NOT NULL DEFAULT '1' AFTER `is_complete`;
+24/06/2024
+ALTER TABLE `app_course_group` ADD `active` INT(1) NOT NULL DEFAULT '1' AFTER `udp_date`;
+29/06/2024
+ALTER TABLE `app_course_cluster` ADD `cg_sort` INT(0) NOT NULL AFTER `cg_amount_random`;
+ALTER TABLE `app_course_lesson` ADD `file_path` VARCHAR(128) NOT NULL AFTER `cs_description`;
+
+
+ALTER TABLE `app_course_cluster` CHANGE `cg_sort` `cg_sort` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `app_course_lesson` ADD `cs_sort` INT NOT NULL DEFAULT '0' AFTER `cs_description`;
+
+08/07/2024
+CREATE TABLE `oas`.`app_mobile_log_version` (`id` INT NOT NULL AUTO_INCREMENT , `version` VARCHAR(12) NOT NULL , `link_android` VARCHAR(128) NOT NULL , `link_ios` VARCHAR(128) NOT NULL , `description` VARCHAR(512) NOT NULL , `crt_date` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+09/08/2024
+ALTER TABLE `app_exam_result` ADD `er_start_time` DATETIME NOT NULL AFTER `er_question_total`;
