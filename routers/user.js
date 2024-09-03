@@ -790,175 +790,18 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
 
 
 
-  let checkUser = await runQuery(
-    "SELECT identification_number FROM app_user_detail WHERE identification_number = ? AND user_id !=?",
-    [identification_number, user_id]
+
+  let result = await runQuery("UPDATE  app_user_detail SET identification_number =? WHERE user_id=? ",
+    [identification_number, user_id],
   );
-  if (checkUser.length >= 1 && identification_number !== "") {
-    return res.status(404).json({
-      status: 404,
-      message: "Invalid 'identification_number'", // error.sqlMessage
-    });
-  }
+ 
 
-  let getUser = await runQuery(
-    "SELECT app_user.user_name ,app_user_detail.id FROM app_user LEFT JOIN app_user_detail ON app_user_detail.user_id  = app_user.user_id  WHERE app_user.user_id = ?",
-    [user_id]
-  );
-  let id_detail = getUser[0]?.id === undefined ? 0 : getUser[0]?.id;
-  console.log(getUser);
-  // if (
-  //   verify_account !== "unactive" &&
-  //   verify_account !== "phone_active" &&
-  //   verify_account !== "phone_unactive" &&
-  //   verify_account !== "system_active" &&
-  //   verify_account !== "system_unactive"
-  // ) {
-  //   return res.status(404).json({
-  //     status: 404,
-  //     message: "Invalid 'verify_account' ", // error.sqlMessage
-  //   });
-  // }
+  return res.status(200).json({
+    status: true,
+  });
 
 
 
-  if (id_detail <= 0) {
-    // let result = await runQuery(
-    //   "INSERT INTO app_user_detail (verify_account,identification_number,user_img, user_birthday,user_address,user_village,location_id,country_id,user_id) VALUES (?,?,?,?,?,?,?,?,?)",
-    //   [
-    //     verify_account,
-    //     identification_number,
-    //     data.user_img,
-    //     data.user_birthday,
-    //     data.user_address,
-    //     data.user_village,
-    //     location_id,
-    //     country_id,
-    //     data.user_id,
-    //   ]
-    // );
-    // return res.json(result);
-
-    return res.status(200).json({
-      access: true,
-    });
-  } else {
-    // let result = await runQuery(
-    //   "UPDATE  app_user_detail SET verify_account=?,identification_number=?, user_img=? , user_birthday=? ,user_address=? ,user_village=?, location_id=? ,country_id=?  WHERE user_id=? ",
-    //   [
-    //     verify_account,
-    //     identification_number,
-    //     data.user_img,
-    //     data.user_birthday,
-    //     data.user_address,
-    //     data.user_village,
-    //     location_id,
-    //     country_id,
-    //     data.user_id,
-    //   ]
-    // );
-    // return res.json(result);
-
-    return res.status(200).json({
-      access: true,
-    });
-  }
-
-  return res.json({ access: true });
-  // let user_id = data.user_id;
-  // let location_id = data.location_id;
-  // let country_id = data.country_id;
-  // let verify_account = data.verify_account;
-  // let identification_number = data.identification_number;
-
-  // ตรวจสอบว่ามีรหัสที่อยู่นี้หรือไม่
-  // let getLocation = await runQuery(
-  //   "SELECT id FROM app_zipcode_lao WHERE id = ?",
-  //   [location_id]
-  // );
-  // if (getLocation.length <= 0) {
-  //   return res.status(404).json({
-  //     status: 404,
-  //     message: "Data is null", // error.sqlMessage
-  //   });
-  // }
-
-  // // ตรวจสอบว่ามีรหัสประเทศนี้หรือไม่
-  // let getCountry = await runQuery(
-  //   "SELECT country_id FROM app_country WHERE country_id = ?",
-  //   [country_id]
-  // );
-  // if (getCountry.length <= 0) {
-  //   return res.status(404).json({
-  //     status: 404,
-  //     message: "Data is null", // error.sqlMessage
-  //   });
-  // }
-
-  // // ตรวจสอบว่ามีรหัสบัตรคนนี้ในระบบหรือไม่
-  // let checkUser = await runQuery(
-  //   "SELECT identification_number FROM app_user_detail WHERE identification_number = ? AND user_id !=?",
-  //   [identification_number, user_id]
-  // );
-  // if (checkUser.length >= 1 && identification_number !== "") {
-  //   return res.status(404).json({
-  //     status: 404,
-  //     message: "Invalid 'identification_number'", // error.sqlMessage
-  //   });
-  // }
-
-  // let getUser = await runQuery(
-  //   "SELECT app_user.user_name ,app_user_detail.id FROM app_user LEFT JOIN app_user_detail ON app_user_detail.user_id  = app_user.user_id  WHERE app_user.user_id = ?",
-  //   [user_id]
-  // );
-  // let id_detail = getUser[0]?.id === undefined ? 0 : getUser[0]?.id;
-  // if (
-  //   verify_account !== "unactive" &&
-  //   verify_account !== "phone_active" &&
-  //   verify_account !== "phone_unactive" &&
-  //   verify_account !== "system_active" &&
-  //   verify_account !== "system_unactive"
-  // ) {
-  //   return res.status(404).json({
-  //     status: 404,
-  //     message: "Invalid 'verify_account' ", // error.sqlMessage
-  //   });
-  // }
-  // // บันทึก
-
-  // if (id_detail <= 0) {
-  //   let result = await runQuery(
-  //     "INSERT INTO app_user_detail (verify_account,identification_number,user_img, user_birthday,user_address,user_village,location_id,country_id,user_id) VALUES (?,?,?,?,?,?,?,?,?)",
-  //     [
-  //       verify_account,
-  //       identification_number,
-  //       data.user_img,
-  //       data.user_birthday,
-  //       data.user_address,
-  //       data.user_village,
-  //       location_id,
-  //       country_id,
-  //       data.user_id,
-  //     ]
-  //   );
-  //   return res.json(result);
-  // } else {
-  //   let result = await runQuery(
-  //     "UPDATE  app_user_detail SET verify_account=?,identification_number=?, user_img=? , user_birthday=? ,user_address=? ,user_village=?, location_id=? ,country_id=?  WHERE user_id=? ",
-  //     [
-  //       verify_account,
-  //       identification_number,
-  //       data.user_img,
-  //       data.user_birthday,
-  //       data.user_address,
-  //       data.user_village,
-  //       location_id,
-  //       country_id,
-  //       data.user_id,
-  //     ]
-  //   );
-  //   return res.json(result);
-  // }
 });
 
 
