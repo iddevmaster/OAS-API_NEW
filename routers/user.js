@@ -312,7 +312,7 @@ router.get("/get/:user_id", middleware, async (req, res, next) => {
   const { user_id } = req.params;
   let sql = `SELECT 
   t1.* ,
-  (SELECT  GROUP_CONCAT((JSON_OBJECT('verify_account', t2.verify_account,'identification_number', t2.identification_number,'user_img', t2.user_img,'user_birthday', t2.user_birthday,'user_address', t2.user_address,'user_village', t2.user_village,'location_id', t2.location_id,'country_id',t2.country_id,
+  (SELECT  GROUP_CONCAT((JSON_OBJECT('verify_account', t2.verify_account,'identification_number', t2.identification_number,'user_img', t2.user_img,'user_birthday', t2.user_birthday,'user_address', t2.user_address,'user_village', t2.user_village,'location_id', t2.location_id,'country_id',t2.country_id,'exp_date',t2.exp_date,
   'location', (SELECT   GROUP_CONCAT((JSON_OBJECT('zipcode', t3.zipcode,'zipcode_name', t3.zipcode_name ,'amphur_code', t3.amphur_code,'amphur_name', t3.amphur_name, 'province_code', t3.province_code,'province_name', t3.province_name)))  FROM app_zipcode_lao t3  WHERE t3.id =  t2.location_id),
   'country', (SELECT   GROUP_CONCAT((JSON_OBJECT('country_name_eng', t4.country_name_eng,'country_official_name_eng', t4.country_official_name_eng , 'capital_name_eng', t4.capital_name_eng,'zone', t4.zone)))  FROM app_country t4  WHERE t4.country_id =  t2.country_id)
   )))  FROM app_user_detail t2  WHERE t2.user_id =  t1.user_id ) AS detail,
@@ -346,6 +346,7 @@ router.get("/get/:user_id", middleware, async (req, res, next) => {
       user_village: detail?.user_village,
       location_id: detail?.location_id,
       country_id: detail?.country_id,
+      exp_date: detail?.exp_date,
       location: location,
       country: country,
     };
@@ -359,6 +360,7 @@ router.get("/get/:user_id", middleware, async (req, res, next) => {
     user_email: data?.user_email,
     user_phone: data?.user_phone,
     user_type: data?.user_type,
+    user_full_name: data?.user_full_name,
     active: data?.active,
     crt_date: data?.crt_date,
     udp_date: data?.udp_date,
@@ -752,5 +754,213 @@ router.put("/verify_otp", middleware, (req, res, next) => {
     }
   );
 });
+router.post("/update/before", middleware, async (req, res, next) => {
+  const data = req.body;
+  let user_id = data.user_id;
+  let identification_number = data.identification_number;
+
+  let checkUser = await runQuery(
+    "SELECT identification_number FROM app_user_detail WHERE identification_number = ? AND user_id !=?",
+    [identification_number, data.user_id]
+  );
+
+  if (checkUser.length >= 1 && identification_number !== "") {
+    return res.status(204).json({
+      status: false,
+    });
+  }
+
+ 
+
+  let result = await runQuery("UPDATE  app_user SET user_prefrix =?,user_firstname =?,user_lastname =? ,user_full_name =?  WHERE user_id=? ",
+    [data.user_prefrix,data.first_name,data.last_name,data.full_name, user_id],
+  );
+  // return res.json(result);
+
+  return res.status(200).json({
+    status: true,
+  });
+
+});
+
+router.post("/detail/verify", middleware, async (req, res, next) => {
+  const data = req.body;
+  let identification_number = data.identification_number;
+  let user_id = data.user_id;
+
+
+
+  let checkUser = await runQuery(
+    "SELECT identification_number FROM app_user_detail WHERE identification_number = ? AND user_id !=?",
+    [identification_number, user_id]
+  );
+  if (checkUser.length >= 1 && identification_number !== "") {
+    return res.status(404).json({
+      status: 404,
+      message: "Invalid 'identification_number'", // error.sqlMessage
+    });
+  }
+
+  let getUser = await runQuery(
+    "SELECT app_user.user_name ,app_user_detail.id FROM app_user LEFT JOIN app_user_detail ON app_user_detail.user_id  = app_user.user_id  WHERE app_user.user_id = ?",
+    [user_id]
+  );
+  let id_detail = getUser[0]?.id === undefined ? 0 : getUser[0]?.id;
+  console.log(getUser);
+  // if (
+  //   verify_account !== "unactive" &&
+  //   verify_account !== "phone_active" &&
+  //   verify_account !== "phone_unactive" &&
+  //   verify_account !== "system_active" &&
+  //   verify_account !== "system_unactive"
+  // ) {
+  //   return res.status(404).json({
+  //     status: 404,
+  //     message: "Invalid 'verify_account' ", // error.sqlMessage
+  //   });
+  // }
+
+
+
+  if (id_detail <= 0) {
+    // let result = await runQuery(
+    //   "INSERT INTO app_user_detail (verify_account,identification_number,user_img, user_birthday,user_address,user_village,location_id,country_id,user_id) VALUES (?,?,?,?,?,?,?,?,?)",
+    //   [
+    //     verify_account,
+    //     identification_number,
+    //     data.user_img,
+    //     data.user_birthday,
+    //     data.user_address,
+    //     data.user_village,
+    //     location_id,
+    //     country_id,
+    //     data.user_id,
+    //   ]
+    // );
+    // return res.json(result);
+
+    return res.status(200).json({
+      access: true,
+    });
+  } else {
+    // let result = await runQuery(
+    //   "UPDATE  app_user_detail SET verify_account=?,identification_number=?, user_img=? , user_birthday=? ,user_address=? ,user_village=?, location_id=? ,country_id=?  WHERE user_id=? ",
+    //   [
+    //     verify_account,
+    //     identification_number,
+    //     data.user_img,
+    //     data.user_birthday,
+    //     data.user_address,
+    //     data.user_village,
+    //     location_id,
+    //     country_id,
+    //     data.user_id,
+    //   ]
+    // );
+    // return res.json(result);
+
+    return res.status(200).json({
+      access: true,
+    });
+  }
+
+  return res.json({ access: true });
+  // let user_id = data.user_id;
+  // let location_id = data.location_id;
+  // let country_id = data.country_id;
+  // let verify_account = data.verify_account;
+  // let identification_number = data.identification_number;
+
+  // ตรวจสอบว่ามีรหัสที่อยู่นี้หรือไม่
+  // let getLocation = await runQuery(
+  //   "SELECT id FROM app_zipcode_lao WHERE id = ?",
+  //   [location_id]
+  // );
+  // if (getLocation.length <= 0) {
+  //   return res.status(404).json({
+  //     status: 404,
+  //     message: "Data is null", // error.sqlMessage
+  //   });
+  // }
+
+  // // ตรวจสอบว่ามีรหัสประเทศนี้หรือไม่
+  // let getCountry = await runQuery(
+  //   "SELECT country_id FROM app_country WHERE country_id = ?",
+  //   [country_id]
+  // );
+  // if (getCountry.length <= 0) {
+  //   return res.status(404).json({
+  //     status: 404,
+  //     message: "Data is null", // error.sqlMessage
+  //   });
+  // }
+
+  // // ตรวจสอบว่ามีรหัสบัตรคนนี้ในระบบหรือไม่
+  // let checkUser = await runQuery(
+  //   "SELECT identification_number FROM app_user_detail WHERE identification_number = ? AND user_id !=?",
+  //   [identification_number, user_id]
+  // );
+  // if (checkUser.length >= 1 && identification_number !== "") {
+  //   return res.status(404).json({
+  //     status: 404,
+  //     message: "Invalid 'identification_number'", // error.sqlMessage
+  //   });
+  // }
+
+  // let getUser = await runQuery(
+  //   "SELECT app_user.user_name ,app_user_detail.id FROM app_user LEFT JOIN app_user_detail ON app_user_detail.user_id  = app_user.user_id  WHERE app_user.user_id = ?",
+  //   [user_id]
+  // );
+  // let id_detail = getUser[0]?.id === undefined ? 0 : getUser[0]?.id;
+  // if (
+  //   verify_account !== "unactive" &&
+  //   verify_account !== "phone_active" &&
+  //   verify_account !== "phone_unactive" &&
+  //   verify_account !== "system_active" &&
+  //   verify_account !== "system_unactive"
+  // ) {
+  //   return res.status(404).json({
+  //     status: 404,
+  //     message: "Invalid 'verify_account' ", // error.sqlMessage
+  //   });
+  // }
+  // // บันทึก
+
+  // if (id_detail <= 0) {
+  //   let result = await runQuery(
+  //     "INSERT INTO app_user_detail (verify_account,identification_number,user_img, user_birthday,user_address,user_village,location_id,country_id,user_id) VALUES (?,?,?,?,?,?,?,?,?)",
+  //     [
+  //       verify_account,
+  //       identification_number,
+  //       data.user_img,
+  //       data.user_birthday,
+  //       data.user_address,
+  //       data.user_village,
+  //       location_id,
+  //       country_id,
+  //       data.user_id,
+  //     ]
+  //   );
+  //   return res.json(result);
+  // } else {
+  //   let result = await runQuery(
+  //     "UPDATE  app_user_detail SET verify_account=?,identification_number=?, user_img=? , user_birthday=? ,user_address=? ,user_village=?, location_id=? ,country_id=?  WHERE user_id=? ",
+  //     [
+  //       verify_account,
+  //       identification_number,
+  //       data.user_img,
+  //       data.user_birthday,
+  //       data.user_address,
+  //       data.user_village,
+  //       location_id,
+  //       country_id,
+  //       data.user_id,
+  //     ]
+  //   );
+  //   return res.json(result);
+  // }
+});
+
+
 
 module.exports = router;
