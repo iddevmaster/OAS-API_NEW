@@ -71,6 +71,244 @@ router.post("/list?", middleware, async (req, res, next) => {
   return res.json(response);
 });
 
+
+
+router.post("/approve/list", middleware, async (req, res, next) => {
+  const data = req.body;
+  const current_page = data.page;
+  const per_page = data.per_page <= 50 ? data.per_page : 50;
+  const search = data.search;
+  const offset = functions.setZero((current_page - 1) * per_page);
+  let total = 0;
+  let total_filter = 0;
+  let search_param = [];
+  let u = "";
+  let sql =
+    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.send_approve,B.identification_number,C.province_name,C.amphur_name FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id  WHERE A.cancelled=1 AND B.status ='W'";
+
+  if (req.query.user_type) {
+    let user_type = req.query.user_type;
+    u = " AND user_type =  " + 3; // ประเภท User
+    sql += u;
+  }
+
+  let sql_count =
+    " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.cancelled=1 AND B.status = 'W' ";
+  let getCountAll = await runQuery(sql_count + u);
+  total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
+
+  if (search !== "" || search.length > 0) {
+    // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
+    let q = ` AND (user_name  LIKE ? OR user_firstname  LIKE  ? OR user_lastname  LIKE  ? OR user_email  LIKE  ? OR user_phone  LIKE  ? OR identification_number  LIKE  ?)`; //
+    sql += q;
+   
+    sql_count += q;
+    search_param = [
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+    ];
+  }
+
+
+
+  let getCountFilter = await runQuery(sql_count + u, search_param);
+
+  total_filter =
+    getCountFilter[0] !== undefined ? getCountFilter[0]?.numRows : 0;
+
+  sql += `  ORDER BY user_id DESC LIMIT ${offset},${per_page} `;
+  let getContent = await runQuery(sql, search_param);
+  const response = {
+    total: total, // จำนวนรายการทั้งหมด
+    total_filter: total_filter, // จำนวนรายการทั้งหมด
+    current_page: current_page, // หน้าที่กำลังแสดงอยู่
+    limit_page: per_page, // limit data
+    total_page: Math.ceil(total_filter / per_page), // จำนวนหน้าทั้งหมด
+    search: search, // คำค้นหา
+    data: getContent, // รายการข้อมูล
+  };
+  return res.json(response);
+});
+
+
+router.post("/approvestaff/list", middleware, async (req, res, next) => {
+  const data = req.body;
+  console.log(data);
+  const current_page = data.page;
+  const per_page = data.per_page <= 50 ? data.per_page : 50;
+  const search = data.search;
+  const offset = functions.setZero((current_page - 1) * per_page);
+  let total = 0;
+  let total_filter = 0;
+  let search_param = [];
+
+  
+
+  let _check_user = await runQuery(
+    "SELECT user_id FROM app_user WHERE user_id = ?",
+    [data.user_id]
+  );
+ 
+  if(_check_user.length == 0 ){
+
+    const response = {
+      total: 0, // จำนวนรายการทั้งหมด
+      total_filter: 0, // จำนวนรายการทั้งหมด
+      current_page: 0, // หน้าที่กำลังแสดงอยู่
+      limit_page: 0, // limit data
+      total_page: 0, // จำนวนหน้าทั้งหมด
+      search: "", // คำค้นหา
+      data: [] // รายการข้อมูล
+    };
+   
+    return res.json(response);
+
+
+  }
+if(!data.user_id){  ////fitter user
+  return res.status(404).json({
+    status: 404,
+  });
+}
+  /////////////////////// เช็ค  sfaff location
+
+  let _check_users = await runQuery(
+    "SELECT 	B.location_id FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.cancelled=1  AND A.user_id=?",
+    [data.user_id]
+  );
+
+  if(!_check_users[0].location_id){
+    return res.status(404).json({
+      status: 404,
+    });
+  }
+
+  const location_id = _check_users[0].location_id
+
+
+
+  ///////////////////////
+  let u = "";
+  let sql =
+    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.send_approve,B.identification_number,C.province_name,C.amphur_name FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id  WHERE A.cancelled=1 AND B.status ='W' AND A.user_type = 3";
+
+  if (location_id) {
+    u = " AND B.location_id = " + location_id; // ประเภท User
+    sql += u;
+  }
+
+
+  let sql_count =
+    " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.cancelled=1 AND B.status = 'W' AND A.user_type = 3";
+  let getCountAll = await runQuery(sql_count,[location_id]);
+  total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
+
+  if (search !== "" || search.length > 0) {
+    // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
+    let q = ` AND (A.user_name  LIKE ? OR A.user_firstname  LIKE  ? OR A.user_lastname  LIKE  ? OR A.user_email  LIKE  ? OR A.user_phone  LIKE  ? OR B.identification_number  LIKE  ?)`; //
+    sql += q;
+   
+    sql_count += q;
+    search_param = [
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+    ];
+  }
+
+ 
+
+  let getCountFilter = await runQuery(sql_count + u, search_param);
+
+
+  total_filter =
+    getCountFilter[0] !== undefined ? getCountFilter[0]?.numRows : 0;
+
+  sql += `  ORDER BY user_id DESC LIMIT ${offset},${per_page} `;
+  let getContent = await runQuery(sql, search_param);
+  const response = {
+    total: total, // จำนวนรายการทั้งหมด
+    total_filter: total_filter, // จำนวนรายการทั้งหมด
+    current_page: current_page, // หน้าที่กำลังแสดงอยู่
+    limit_page: per_page, // limit data
+    total_page: Math.ceil(total_filter / per_page), // จำนวนหน้าทั้งหมด
+    search: search, // คำค้นหา
+    data: getContent, // รายการข้อมูล
+  };
+
+  return res.json(response);
+});
+
+
+router.post("/list/get", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  /////////////////////////////////////////////// เช็ค Group User
+
+  let check_user = await runQuery(
+    "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ?",
+    [data.user_admin_id]
+  );
+
+  if (check_user.length == 0) {
+    let datauser = [];
+    return res.json(datauser);
+  }
+ 
+
+  let datastype = check_user[0].user_type;
+  if(datastype == 1){  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 1
+    let datauser = await runQuery(
+      "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ? AND B.status ='W'",
+      [data.user_search_id]
+    );
+    return res.json(datauser);
+  }else if(datastype == 2){  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 2
+
+
+      /////////////////////////////  เช็ค User ประชาชนว่า มีรึไหม
+let datauser = await runQuery(
+  "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ? AND B.status ='W'",
+  [data.user_search_id]
+);
+
+if(datauser.length == 0){  /////////////////////////////  เช็ค User ประชาชนว่า มีรึไหม  กรณี ไม่มี
+  let datauser = [];
+  return res.json(datauser);
+}
+
+const location_staff = check_user[0].location_id;
+const location_user = datauser[0].location_id;
+
+
+if(location_staff == location_user){
+
+
+
+
+  return res.json(datauser);
+}else {
+  let datauser = [];
+  return res.json(datauser);
+}
+
+ 
+  }else {  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 1
+    let datauser = [];
+    return res.json(datauser);
+  }
+  
+
+});
+
+
 router.post("/login", middleware, (req, res, next) => {
   const data = req.body;
 
@@ -787,15 +1025,19 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
   const data = req.body;
   let identification_number = data.identification_number;
   let user_id = data.user_id;
+  let user_address = data.user_address;
+  let user_village = data.user_village;
+  let location_id = data.location_id;
+  let country_id = data.country_id;
+  let real_image = data.real_image;
+  let passpost_image = data.passpost_image;
+  let status = 'W';
 
 
-
-
-  let result = await runQuery("UPDATE  app_user_detail SET identification_number =? WHERE user_id=? ",
-    [identification_number, user_id],
+  let result = await runQuery("UPDATE  app_user_detail SET identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =? WHERE user_id=? ",
+    [identification_number, user_address, user_village, location_id, country_id, real_image, passpost_image, status, user_id],
   );
  
-
   return res.status(200).json({
     status: true,
   });
