@@ -86,11 +86,8 @@ router.post("/approve/list", middleware, async (req, res, next) => {
   let sql =
     "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.send_approve,B.identification_number,C.province_name,C.amphur_name FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id  WHERE A.cancelled=1 AND B.status ='W'";
 
-  if (req.query.user_type) {
-    let user_type = req.query.user_type;
-    u = " AND user_type =  " + 3; // ประเภท User
+    u = " AND user_type = 3"; // ประเภท User
     sql += u;
-  }
 
   let sql_count =
     " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.cancelled=1 AND B.status = 'W' ";
@@ -101,7 +98,7 @@ router.post("/approve/list", middleware, async (req, res, next) => {
     // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
     let q = ` AND (user_name  LIKE ? OR user_firstname  LIKE  ? OR user_lastname  LIKE  ? OR user_email  LIKE  ? OR user_phone  LIKE  ? OR identification_number  LIKE  ?)`; //
     sql += q;
-   
+
     sql_count += q;
     search_param = [
       `%${search}%`,
@@ -137,7 +134,7 @@ router.post("/approve/list", middleware, async (req, res, next) => {
 
 router.post("/approvestaff/list", middleware, async (req, res, next) => {
   const data = req.body;
-  console.log(data);
+
   const current_page = data.page;
   const per_page = data.per_page <= 50 ? data.per_page : 50;
   const search = data.search;
@@ -266,7 +263,7 @@ router.post("/list/get", middleware, async (req, res, next) => {
   let datastype = check_user[0].user_type;
   if(datastype == 1){  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 1
     let datauser = await runQuery(
-      "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ? AND B.status ='W'",
+      "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ? AND B.status ='W'",
       [data.user_search_id]
     );
     return res.json(datauser);
@@ -275,7 +272,7 @@ router.post("/list/get", middleware, async (req, res, next) => {
 
       /////////////////////////////  เช็ค User ประชาชนว่า มีรึไหม
 let datauser = await runQuery(
-  "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ? AND B.status ='W'",
+  "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ? AND B.status ='W'",
   [data.user_search_id]
 );
 
@@ -306,6 +303,53 @@ if(location_staff == location_user){
   }
   
 
+});
+
+
+
+router.post("/list/get/profile", middleware, async (req, res, next) => {
+  const data = req.body;
+;
+  /////////////////////////////////////////////// เช็ค Group User
+
+  let check_user = await runQuery(
+    "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ?",
+    [data.user_id]
+  );
+
+  if (check_user.length == 0) {
+    let datauser = [];
+    return res.json(datauser);
+  }
+ 
+ 
+  let datastype = check_user[0].user_type;
+ 
+  if(datastype == 3){  
+    let datauser = await runQuery(
+      "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ?",
+      [data.user_id]
+    );
+    return res.json(datauser);
+  }
+
+});
+
+
+
+router.post("/list/get/comment", middleware, async (req, res, next) => {
+  const data = req.body;
+
+
+  let getContent = await runQuery(
+    "SELECT * from app_comment_card WHERE user_id =? ORDER BY comment_id DESC LIMIT 2",
+    [data.user_search_id]
+  );
+
+  const response = {
+    data: getContent, // รายการข้อมูล
+  };
+  return res.json(response);
 });
 
 
@@ -992,6 +1036,40 @@ router.put("/verify_otp", middleware, (req, res, next) => {
     }
   );
 });
+
+
+router.post("/update/approve/pedding", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  const user_search_id = data.user_search_id;
+  const user_admin_id = data.user_admin_id;
+  const comment_details = data.comment_details;
+  const approve = data.approve;
+  
+  // return res.json(result);
+
+  let result = await runQuery(
+    "INSERT INTO app_comment_card (comment_details,user_id,crt_date,udp_date,user_crt) VALUES (?,?,?,?,?)",
+    [
+      comment_details,
+      user_search_id,
+      functions.dateAsiaThai(),
+      functions.dateAsiaThai(),
+      user_admin_id,
+    ]
+  );
+
+  let result_update = await runQuery("UPDATE app_user_detail SET status =? WHERE user_id=? ",
+    [approve,user_search_id],
+  );
+
+
+  return res.status(200).json({
+    status: true,
+  });
+
+});
+
 router.post("/update/before", middleware, async (req, res, next) => {
   const data = req.body;
   let user_id = data.user_id;
