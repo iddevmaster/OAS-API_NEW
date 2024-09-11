@@ -1109,11 +1109,13 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
   let country_id = data.country_id;
   let real_image = data.real_image;
   let passpost_image = data.passpost_image;
+  let exp_date = data.expire;
+  let user_birthday = data.user_birthday;
   let status = 'W';
 
-
-  let result = await runQuery("UPDATE  app_user_detail SET identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =? WHERE user_id=? ",
-    [identification_number, user_address, user_village, location_id, country_id, real_image, passpost_image, status, user_id],
+console.log(data);
+  let result = await runQuery("UPDATE  app_user_detail SET identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =?,exp_date =?,user_birthday =? WHERE user_id=? ",
+    [identification_number, user_address, user_village, location_id, country_id, real_image, passpost_image, status,exp_date,user_birthday, user_id],
   );
  
   return res.status(200).json({
