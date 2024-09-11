@@ -11,7 +11,7 @@ const util = require("util");
 //   // timezone: "+016:00",
 // });
 const pool = mysql.createPool({
-  host: "27.254.149.239",
+  host: "127.0.0.1",
   user: "root",
   port: "3306",
   // password: "",
