@@ -309,7 +309,7 @@ if(location_staff == location_user){
 
 router.post("/list/get/profile", middleware, async (req, res, next) => {
   const data = req.body;
-;
+  console.log(data);
   /////////////////////////////////////////////// เช็ค Group User
 
   let check_user = await runQuery(
@@ -317,6 +317,7 @@ router.post("/list/get/profile", middleware, async (req, res, next) => {
     [data.user_id]
   );
 
+  console.log(check_user);
   if (check_user.length == 0) {
     let datauser = [];
     return res.json(datauser);
@@ -330,8 +331,14 @@ router.post("/list/get/profile", middleware, async (req, res, next) => {
       "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ?",
       [data.user_id]
     );
+
+    return res.json(datauser);
+  }else {
+    let datauser = [];
     return res.json(datauser);
   }
+
+ 
 
 });
 
@@ -594,7 +601,7 @@ router.get("/get/:user_id", middleware, async (req, res, next) => {
   const { user_id } = req.params;
   let sql = `SELECT 
   t1.* ,
-  (SELECT  GROUP_CONCAT((JSON_OBJECT('verify_account', t2.verify_account,'identification_number', t2.identification_number,'user_img', t2.user_img,'user_birthday', t2.user_birthday,'user_address', t2.user_address,'user_village', t2.user_village,'location_id', t2.location_id,'country_id',t2.country_id,'exp_date',t2.exp_date,
+  (SELECT  GROUP_CONCAT((JSON_OBJECT('verify_account', t2.verify_account,'identification_number', t2.identification_number,'user_img', t2.user_img,'user_birthday', t2.user_birthday,'user_address', t2.user_address,'user_village', t2.user_village,'location_id', t2.location_id,'country_id',t2.country_id,'exp_date',t2.exp_date,'passpost_image',t2.passpost_image,'real_image',t2.real_image,'status',t2.status,
   'location', (SELECT   GROUP_CONCAT((JSON_OBJECT('zipcode', t3.zipcode,'zipcode_name', t3.zipcode_name ,'amphur_code', t3.amphur_code,'amphur_name', t3.amphur_name, 'province_code', t3.province_code,'province_name', t3.province_name)))  FROM app_zipcode_lao t3  WHERE t3.id =  t2.location_id),
   'country', (SELECT   GROUP_CONCAT((JSON_OBJECT('country_name_eng', t4.country_name_eng,'country_official_name_eng', t4.country_official_name_eng , 'capital_name_eng', t4.capital_name_eng,'zone', t4.zone)))  FROM app_country t4  WHERE t4.country_id =  t2.country_id)
   )))  FROM app_user_detail t2  WHERE t2.user_id =  t1.user_id ) AS detail,
@@ -629,10 +636,15 @@ router.get("/get/:user_id", middleware, async (req, res, next) => {
       location_id: detail?.location_id,
       country_id: detail?.country_id,
       exp_date: detail?.exp_date,
+      passpost_image: detail?.passpost_image,
+      real_image: detail?.real_image,
       location: location,
       country: country,
+      status: detail?.status,
     };
   }
+
+
   const response = {
     user_id: data?.user_id,
     user_name: data?.user_name,
@@ -1045,7 +1057,15 @@ router.post("/update/approve/pedding", middleware, async (req, res, next) => {
   const user_admin_id = data.user_admin_id;
   const comment_details = data.comment_details;
   const approve = data.approve;
+
+  if(data.approve == 'Y'){
+    verify_account = 'system_active'
+  }
+  if(data.approve == 'N'){
+    verify_account = 'system_unactive'
+  }
   
+
   // return res.json(result);
 
   let result = await runQuery(
@@ -1059,8 +1079,8 @@ router.post("/update/approve/pedding", middleware, async (req, res, next) => {
     ]
   );
 
-  let result_update = await runQuery("UPDATE app_user_detail SET status =? WHERE user_id=? ",
-    [approve,user_search_id],
+  let result_update = await runQuery("UPDATE app_user_detail SET verify_account =?,status =? WHERE user_id=? ",
+    [verify_account,approve,user_search_id],
   );
 
 
@@ -1099,6 +1119,21 @@ router.post("/update/before", middleware, async (req, res, next) => {
 
 });
 
+
+router.post("/update/profile/image", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let result = await runQuery("UPDATE app_user_detail SET user_img =? WHERE user_id=? ",
+    [data.user_image, data.user_id],
+  );
+
+
+  return res.status(200).json({
+    status: true,
+  });
+
+});
+
 router.post("/detail/verify", middleware, async (req, res, next) => {
   const data = req.body;
   let identification_number = data.identification_number;
@@ -1112,10 +1147,13 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
   let exp_date = data.expire;
   let user_birthday = data.user_birthday;
   let status = 'W';
+  let verify_account = 'phone_active';
 
-console.log(data);
-  let result = await runQuery("UPDATE  app_user_detail SET identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =?,exp_date =?,user_birthday =? WHERE user_id=? ",
-    [identification_number, user_address, user_village, location_id, country_id, real_image, passpost_image, status,exp_date,user_birthday, user_id],
+
+  // phone_active
+
+  let result = await runQuery("UPDATE  app_user_detail SET verify_account =?, identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =?,exp_date =?,user_birthday =? WHERE user_id=? ",
+    [verify_account, identification_number, user_address, user_village, location_id, country_id, passpost_image, real_image, status,exp_date,user_birthday, user_id],
   );
  
   return res.status(200).json({
