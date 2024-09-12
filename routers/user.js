@@ -1165,8 +1165,18 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
 
 router.post("/changetel", middleware, async (req, res, next) => {
   const data = req.body;
+  let checkUser = await runQuery(
+    "SELECT user_phone FROM app_user WHERE user_phone =? AND cancelled=1",
+    [data.changeiden]
+  );
 
-console.log(data);
+  if (checkUser.length >= 1) {
+    return res.status(200).json({
+      status: false,
+    });
+  }
+
+
   return res.status(200).json({
     status: true,
   });
