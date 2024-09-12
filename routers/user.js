@@ -1031,6 +1031,100 @@ router.get("/otp/:user_id", middleware, (req, res, next) => {
   );
 });
 
+
+router.post("/change/otp/:changeiden", middleware, (req, res, next) => {
+  const { changeiden } = req.params;
+  const data = req.body;
+  let user_id = data.user_id;
+  console.log(data);
+  const otp_code = Math.floor(100000 + Math.random() * 900000);
+  const otp_ref = functions.randomCode();
+  const sms_key = "ufCeK941cimODrm6iCtisQg1JFAdGu62";
+  const genNumber = Math.floor(100 + Math.random() * 100);
+  const date = new Date();
+  const dateText =
+    date.getFullYear() +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    ("0" + date.getDate()).slice(-2) +
+    ("0" + date.getHours()).slice(-2) +
+    ("0" + date.getMinutes()).slice(-2) +
+    ("0" + date.getSeconds()).slice(-2);
+
+  con.query(
+    "SELECT app_user.user_name ,app_user.user_phone,app_user_otp.total_request FROM app_user LEFT JOIN app_user_otp ON app_user_otp.user_id  = app_user.user_id  WHERE app_user.user_id = ?",
+    [user_id],
+
+    (err, rows) => {
+      let checkuser = rows.length;
+      if (checkuser <= 0) {
+        return res.status(204).json({
+          status: 204,
+          message: "Data is null", // error.sqlMessage
+        });
+      }
+
+      let user_phone =
+        rows[0]?.user_phone === undefined ? 0 : rows[0]?.user_phone;
+
+      let total_request =
+        rows[0]?.total_request === undefined ? 0 : rows[0]?.total_request;
+      let total_request_set = total_request + 1;
+
+      if (total_request <= 0) {
+        con.query(
+          "INSERT INTO app_user_otp (otp_code,otp_ref,total_request, crt_date,udp_date,user_id) VALUES (?,?,?,?,?,?)",
+          [
+            otp_code,
+            otp_ref,
+            1,
+            functions.dateAsiaThai(),
+            functions.dateAsiaThai(),
+            user_id,
+          ]
+        );
+      } else {
+        con.query(
+          "UPDATE  app_user_otp SET otp_code=?,otp_ref=?, total_request=? , udp_date=?  WHERE user_id=? ",
+          [
+            otp_code,
+            otp_ref,
+            total_request_set,
+            functions.dateAsiaThai(),
+            user_id,
+          ]
+        );
+      }
+      // SMS API
+      // let data = {
+      //   transaction_id: "DTC" + dateText + genNumber.toString(),
+      //   header: "DOT",
+      //   phoneNumber: "856" + user_phone,
+      //   message: "Your OTP is " + otp_code + " REF:" + otp_ref,
+      // };
+      // request(
+      //   {
+      //     method: "POST",
+      //     body: data,
+      //     json: true,
+      //     url: "https://apicenter.laotel.com:9443/api/sms_center/submit_sms",
+      //     headers: {
+      //       Apikey: sms_key,
+      //       "Content-Type": "application/json",
+      //     },
+      //   },
+      //   function (error, response, body) {
+      //     console.log(body);
+      //   }
+      // );
+      return res.json({
+        otp_code: otp_code,
+        otp_ref: otp_ref,
+        total_request: total_request_set,
+      });
+    }
+  );
+});
+
 router.put("/verify_otp", middleware, (req, res, next) => {
   const data = req.body;
   let otp_code = data.otp_code;
