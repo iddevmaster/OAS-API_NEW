@@ -1227,6 +1227,22 @@ router.post("/update/profile/image", middleware, async (req, res, next) => {
 
 });
 
+
+router.post("/update/changetel", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let result = await runQuery("UPDATE app_user SET user_phone =? WHERE user_id=? ",
+    [data.changeiden, data.user_id],
+  );
+
+
+  return res.status(200).json({
+    status: true,
+  });
+
+});
+
+
 router.post("/detail/verify", middleware, async (req, res, next) => {
   const data = req.body;
   let identification_number = data.identification_number;
