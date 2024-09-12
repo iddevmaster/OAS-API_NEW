@@ -453,10 +453,8 @@ router.post("/log/updatedata", middleware, async (req, res, next) => {
     "SELECT * from app_log_update_data WHERE user_id =? ORDER BY log_id DESC LIMIT 1",
     [data.user_id]
   );
-
   const response = getContent;
   return res.json(response);
-
 });
 
 
@@ -1107,7 +1105,7 @@ router.post("/change/otp/:changeiden", middleware, (req, res, next) => {
   const { changeiden } = req.params;
   const data = req.body;
   let user_id = data.user_id;
-  console.log(data);
+ 
   const otp_code = Math.floor(100000 + Math.random() * 900000);
   const otp_ref = functions.randomCode();
   const sms_key = "ufCeK941cimODrm6iCtisQg1JFAdGu62";
@@ -1166,27 +1164,28 @@ router.post("/change/otp/:changeiden", middleware, (req, res, next) => {
         );
       }
       // SMS API
-      // let data = {
-      //   transaction_id: "DTC" + dateText + genNumber.toString(),
-      //   header: "DOT",
-      //   phoneNumber: "856" + user_phone,
-      //   message: "Your OTP is " + otp_code + " REF:" + otp_ref,
-      // };
-      // request(
-      //   {
-      //     method: "POST",
-      //     body: data,
-      //     json: true,
-      //     url: "https://apicenter.laotel.com:9443/api/sms_center/submit_sms",
-      //     headers: {
-      //       Apikey: sms_key,
-      //       "Content-Type": "application/json",
-      //     },
-      //   },
-      //   function (error, response, body) {
-      //     console.log(body);
-      //   }
-      // );
+
+      let data = {
+        transaction_id: "DTC" + dateText + genNumber.toString(),
+        header: "DOT",
+        phoneNumber: "856" + changeiden,
+        message: "Your OTP is " + otp_code + " REF:" + otp_ref,
+      };
+      request(
+        {
+          method: "POST",
+          body: data,
+          json: true,
+          url: "https://apicenter.laotel.com:9443/api/sms_center/submit_sms",
+          headers: {
+            Apikey: sms_key,
+            "Content-Type": "application/json",
+          },
+        },
+        function (error, response, body) {
+          console.log(body);
+        }
+      );
       return res.json({
         otp_code: otp_code,
         otp_ref: otp_ref,
