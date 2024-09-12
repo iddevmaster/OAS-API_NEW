@@ -309,7 +309,7 @@ if(location_staff == location_user){
 
 router.post("/list/get/profile", middleware, async (req, res, next) => {
   const data = req.body;
-  console.log(data);
+
   /////////////////////////////////////////////// เช็ค Group User
 
   let check_user = await runQuery(
@@ -317,7 +317,7 @@ router.post("/list/get/profile", middleware, async (req, res, next) => {
     [data.user_id]
   );
 
-  console.log(check_user);
+
   if (check_user.length == 0) {
     let datauser = [];
     return res.json(datauser);
@@ -1106,7 +1106,6 @@ router.post("/update/before", middleware, async (req, res, next) => {
     });
   }
 
- 
 
   let result = await runQuery("UPDATE  app_user SET user_prefrix =?,user_firstname =?,user_lastname =? ,user_full_name =?  WHERE user_id=? ",
     [data.user_prefrix,data.first_name,data.last_name,data.full_name, user_id],
@@ -1161,6 +1160,16 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
   });
 
 
+
+});
+
+router.post("/changetel", middleware, async (req, res, next) => {
+  const data = req.body;
+
+console.log(data);
+  return res.status(200).json({
+    status: true,
+  });
 
 });
 
