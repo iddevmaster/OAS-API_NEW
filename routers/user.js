@@ -362,7 +362,6 @@ router.post("/list/get/comment", middleware, async (req, res, next) => {
 
 router.post("/login", middleware, (req, res, next) => {
   const data = req.body;
-
   con.query(
     "SELECT * FROM app_user WHERE active = 1 AND cancelled=1 AND (user_name = ? OR user_email=? OR user_phone=?)",
     [data.user_name, data.user_name, data.user_name],
@@ -385,6 +384,16 @@ router.post("/login", middleware, (req, res, next) => {
               crt_date: r?.crt_date,
               udp_date: r?.udp_date,
             };
+
+            let result = runQuery(
+              "INSERT INTO app_log_login (user_id,login_date,udp_date) VALUES (?,?,?)",
+              [
+                r?.user_id,
+                functions.dateAsiaThai(),
+                functions.dateAsiaThai(),
+              ]
+            );
+          
             return res.json(js);
           } else {
             return res.status(400).json({
@@ -403,6 +412,25 @@ router.post("/login", middleware, (req, res, next) => {
         });
     }
   );
+});
+
+
+router.post("/login/log", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let result = await runQuery(
+    "INSERT INTO app_log_login (user_id,login_date,udp_date) VALUES (?,?,?)",
+    [
+      data.user_id,
+      functions.dateAsiaThai(),
+      functions.dateAsiaThai(),
+    ]
+  );
+
+
+  return res.status(200).json({
+    status: true,
+  });
 });
 
 router.post("/create", middleware, async (req, res, next) => {
