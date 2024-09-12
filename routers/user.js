@@ -433,6 +433,49 @@ router.post("/login/log", middleware, async (req, res, next) => {
   });
 });
 
+router.post("/log/login", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let getContent = await runQuery(
+    "SELECT * from app_log_login WHERE user_id =? ORDER BY log_id DESC LIMIT 1",
+    [data.user_id]
+  );
+
+  const response = getContent;
+  return res.json(response);
+
+});
+
+router.post("/log/updatedata", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let getContent = await runQuery(
+    "SELECT * from app_log_update_data WHERE user_id =? ORDER BY log_id DESC LIMIT 1",
+    [data.user_id]
+  );
+
+  const response = getContent;
+  return res.json(response);
+
+});
+
+
+router.post("/updatedata/log", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let result = await runQuery(
+    "INSERT INTO app_log_update_data (user_id,update_data,udp_date) VALUES (?,?,?)",
+    [
+      data.user_id,
+      functions.dateAsiaThai(),
+      functions.dateAsiaThai(),
+    ]
+  );
+  return res.status(200).json({
+    status: true,
+  });
+});
+
 router.post("/create", middleware, async (req, res, next) => {
   const data = req.body;
   const user_name = data.user_name;
