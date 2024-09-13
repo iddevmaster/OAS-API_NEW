@@ -1329,10 +1329,9 @@ router.post("/detail/verify", middleware, async (req, res, next) => {
   let verify_account = 'phone_active';
 
 
-  // phone_active
 
-  let result = await runQuery("UPDATE  app_user_detail SET verify_account =?, identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =?,exp_date =?,user_birthday =? WHERE user_id=? ",
-    [verify_account, identification_number, user_address, user_village, location_id, country_id, passpost_image, real_image, status,exp_date,user_birthday, user_id],
+  let result = await runQuery("UPDATE  app_user_detail SET verify_account =?, identification_number =?,user_address =?,user_village =?,location_id =?,country_id =?,passpost_image =?,real_image =?,status =?,exp_date =?,user_birthday =?,send_approve =? WHERE user_id=? ",
+    [verify_account, identification_number, user_address, user_village, location_id, country_id, passpost_image, real_image, status,exp_date,user_birthday,functions.dateAsiaThai(), user_id],
   );
  
   return res.status(200).json({
