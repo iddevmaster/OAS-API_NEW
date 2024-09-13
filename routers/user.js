@@ -1362,6 +1362,29 @@ router.post("/changetel", middleware, async (req, res, next) => {
 
 });
 
+router.post("/checkemail", middleware, async (req, res, next) => {
+  const data = req.body;
+ 
+  let checkUser = await runQuery(
+    "SELECT * FROM app_user WHERE user_id !=? AND user_email =? AND cancelled=1",
+    [data.user_id,data.email]
+  );
+
+  if (checkUser.length >= 1) {
+    return res.status(200).json({
+      status: false,
+    });
+  }
+
+
+  return res.status(200).json({
+    status: true,
+  });
+
+
+});
+
+
 
 
 module.exports = router;
