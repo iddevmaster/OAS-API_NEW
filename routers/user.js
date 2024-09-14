@@ -149,6 +149,8 @@ router.post("/approvestaff/list", middleware, async (req, res, next) => {
     "SELECT user_id FROM app_user WHERE user_id = ?",
     [data.user_id]
   );
+
+
  
   if(_check_user.length == 0 ){
 
@@ -178,6 +180,7 @@ if(!data.user_id){  ////fitter user
     [data.user_id]
   );
 
+
   if(!_check_users[0].location_id){
     return res.status(404).json({
       status: 404,
@@ -201,7 +204,8 @@ if(!data.user_id){  ////fitter user
 
   let sql_count =
     " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.cancelled=1 AND B.status = 'W' AND A.user_type = 3";
-  let getCountAll = await runQuery(sql_count,[location_id]);
+  let getCountAll = await runQuery(sql_count+u);
+
   total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
 
   if (search !== "" || search.length > 0) {
@@ -219,7 +223,7 @@ if(!data.user_id){  ////fitter user
       `%${search}%`,
     ];
   }
-
+ 
  
 
   let getCountFilter = await runQuery(sql_count + u, search_param);
@@ -286,22 +290,15 @@ const location_user = datauser[0].location_id;
 
 
 if(location_staff == location_user){
-
-
-
-
   return res.json(datauser);
 }else {
   let datauser = [];
   return res.json(datauser);
 }
-
- 
   }else {  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 1
     let datauser = [];
     return res.json(datauser);
   }
-  
 
 });
 
