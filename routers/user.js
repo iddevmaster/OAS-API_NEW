@@ -1386,5 +1386,51 @@ router.post("/checkemail", middleware, async (req, res, next) => {
 
 
 
+router.post("/checkuserpopulation", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  console.log(data);
+
+  let datas = {};
+  datas.checkphone = false;
+  datas.checkemail = false;
+  datas.checkusername = false;
+  datas.checkIden = false;
+  
+ 
+  let checkPhone = await runQuery(
+    "SELECT * FROM app_user WHERE user_phone =? AND cancelled=1",
+    [data.user_phone]
+  );
+
+  let checkEmail = await runQuery(
+    "SELECT * FROM app_user WHERE user_email =? AND cancelled=1",
+    [data.email]
+  );
+  let checkUser = await runQuery(
+    "SELECT * FROM app_user WHERE user_name =? AND cancelled=1",
+    [data.user_name]
+  );
+  let checkIden = await runQuery(
+    "SELECT B.identification_number FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE B.identification_number =? AND A.cancelled=1",
+    [data.identification_number]
+  );
+
+  if (checkPhone.length > 0) {
+    datas.checkphone = true
+  }
+  if (checkEmail.length > 0) {
+    datas.checkemail = true
+  }
+  if (checkUser.length > 0) {
+    datas.checkusername = true
+  }
+  if (checkIden.length > 0) {
+    datas.checkIden = true
+  }
+  return res.status(200).json(datas);
+});
+
+
 
 module.exports = router;
