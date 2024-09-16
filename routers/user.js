@@ -331,7 +331,10 @@ router.post("/list/get/profile", middleware, async (req, res, next) => {
 
     return res.json(datauser);
   }else {
-    let datauser = [];
+    let datauser = await runQuery(
+      "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ?",
+      [data.user_id]
+    );
     return res.json(datauser);
   }
 
