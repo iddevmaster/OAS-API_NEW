@@ -1388,9 +1388,6 @@ router.post("/checkemail", middleware, async (req, res, next) => {
 
 router.post("/checkuserpopulation", middleware, async (req, res, next) => {
   const data = req.body;
-
-  console.log(data);
-
   let datas = {};
   datas.checkphone = false;
   datas.checkemail = false;
@@ -1429,6 +1426,67 @@ router.post("/checkuserpopulation", middleware, async (req, res, next) => {
     datas.checkIden = true
   }
   return res.status(200).json(datas);
+});
+
+
+
+router.post("/createuserpopulation", middleware, async (req, res, next) => {
+  const data = req.body;
+  const user_name = data.username;
+  const user_phone = data.user_phone;
+  const user_email = data.user_email;
+  const user_type = data.user_type;
+  const exp_date = data.expire;
+  
+
+
+  bcrypt
+    .hash(data.user_password, numSaltRounds)
+    .then((hash) => {
+      let userHash = hash;
+      // console.log("Hash ", hash);
+      con.query(
+        "INSERT INTO app_user (user_name, user_password,user_prefrix,user_firstname,user_lastname,user_email,user_phone,user_type,active,user_full_name,crt_date,udp_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        [
+          user_name,
+          userHash,
+          data.user_prefrix,
+          data.first_name,
+          data.last_name,
+          user_email,
+          user_phone,
+          data.user_type,
+          data.active,
+          data.full_name,
+          functions.dateAsiaThai(),
+          functions.dateAsiaThai(),
+        ],
+        async function (err, result) {
+          if (err) throw err;
+          // console.log("1 record inserted");
+          await runQuery(
+            "INSERT INTO app_user_detail (verify_account,identification_number,user_img, user_birthday,user_address,user_village,location_id,country_id,passpost_image,real_image,status,exp_date,user_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            [
+              data.verify_account,
+              data.identification_number,
+              "",
+             data.user_birthday,
+             data.user_address,
+             data.user_village,
+             data.location_id,
+             33,
+             data.passpost_image,
+             data.real_image,
+             "Y",
+             exp_date,
+              result?.insertId,
+            ]
+          );
+          return res.json(result);
+        }
+      );
+    })
+    .catch((err) => console.error(err.message));
 });
 
 
