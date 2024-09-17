@@ -25,6 +25,7 @@ router.post("/list?", middleware, async (req, res, next) => {
   let total_filter = 0;
   let search_param = [];
   let u = "";
+  let c = "";
   let sql =
     "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1";
 
