@@ -40,13 +40,22 @@ router.post("/list?", middleware, async (req, res, next) => {
 if(data.verify_account == 'system_active'){
   c = " AND B.verify_account = 'system_active'"; 
   sql += c;
-  console.log('system_active');
+
 }
 if(data.verify_account == 'phone_active'){
   c = " AND B.verify_account = 'phone_active'"; 
   sql += c;
-  console.log('phone_active');
 }
+if(data.verify_account == 'unactive'){
+  c = " AND B.verify_account = 'unactive'"; 
+  sql += c;
+}
+
+if(data.verify_account == 'system_unactive'){
+  c = " AND B.verify_account = 'system_unactive'"; 
+  sql += c;
+}
+
 
   }
 
