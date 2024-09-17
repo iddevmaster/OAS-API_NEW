@@ -66,7 +66,7 @@ if(data.verify_account == 'system_unactive'){
 
   if (search !== "" || search.length > 0) {
     // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
-    let q = ` AND (A.user_name  LIKE ? OR A.user_firstname  LIKE  ? OR A.user_lastname  LIKE  ? OR A.user_email  LIKE  ? OR A.user_phone  LIKE  ? OR B.verify_account LIKE  ?)`; //
+    let q = ` AND (A.user_name  LIKE ? OR A.user_firstname  LIKE  ? OR A.user_lastname  LIKE  ? OR A.user_email  LIKE  ? OR A.user_phone  LIKE  ? OR B.identification_number LIKE  ?)`; //
     sql += q;
     sql_count += q;
     search_param = [
