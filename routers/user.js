@@ -393,6 +393,10 @@ router.post("/login", middleware, (req, res, next) => {
                 functions.dateAsiaThai(),
               ]
             );
+
+            let log_last = runQuery("UPDATE app_user SET login_last_date =? WHERE user_id=? ",
+              [functions.dateAsiaThai(),r?.user_id],
+            );
           
             return res.json(js);
           } else {
@@ -430,9 +434,7 @@ router.post("/login/log", middleware, async (req, res, next) => {
 
 
 
-  let log_last = await runQuery("UPDATE  app_user SET login_last_date =? WHERE user_id=? ",
-    [functions.dateAsiaThai(),data.user_id],
-  );
+
 
   return res.status(200).json({
     status: true,
