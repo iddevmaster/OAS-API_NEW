@@ -17,6 +17,7 @@ async function runQuery(sql, param) {
 
 router.post("/list?", middleware, async (req, res, next) => {
   const data = req.body;
+  console.log(data);
   const current_page = data.page;
   const per_page = data.per_page <= 50 ? data.per_page : 50;
   const search = data.search;
@@ -33,7 +34,6 @@ router.post("/list?", middleware, async (req, res, next) => {
     let user_type = req.query.user_type;
     u = " AND A.user_type =  " + user_type; // ประเภท User
     sql += u;
-   
   }
 
   if (data.verify_account) {
