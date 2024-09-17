@@ -26,22 +26,37 @@ router.post("/list?", middleware, async (req, res, next) => {
   let search_param = [];
   let u = "";
   let sql =
-    "SELECT 	user_id,  user_name,  user_firstname,  user_lastname, user_email, user_phone, user_type, crt_date, udp_date  FROM app_user WHERE cancelled=1";
+    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1";
 
   if (req.query.user_type) {
     let user_type = req.query.user_type;
-    u = " AND user_type =  " + user_type; // ประเภท User
+    u = " AND A.user_type =  " + user_type; // ประเภท User
     sql += u;
+   
+  }
+
+  if (data.verify_account) {
+if(data.verify_account == 'system_active'){
+  c = " AND B.verify_account = 'system_active'"; 
+  sql += c;
+  console.log('system_active');
+}
+if(data.verify_account == 'phone_active'){
+  c = " AND B.verify_account = 'phone_active'"; 
+  sql += c;
+  console.log('phone_active');
+}
+
   }
 
   let sql_count =
-    " SELECT  COUNT(*) as numRows FROM  app_user WHERE  cancelled=1 ";
-  let getCountAll = await runQuery(sql_count + u);
+    " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE  cancelled=1 ";
+  let getCountAll = await runQuery(sql_count + u + c);
   total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
 
   if (search !== "" || search.length > 0) {
     // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
-    let q = ` AND (user_name  LIKE ? OR user_firstname  LIKE  ? OR user_lastname  LIKE  ? OR user_email  LIKE  ? OR user_phone  LIKE  ?)`; //
+    let q = ` AND (A.user_name  LIKE ? OR A.user_firstname  LIKE  ? OR A.user_lastname  LIKE  ? OR A.user_email  LIKE  ? OR A.user_phone  LIKE  ?)`; //
     sql += q;
     sql_count += q;
     search_param = [
@@ -53,7 +68,7 @@ router.post("/list?", middleware, async (req, res, next) => {
     ];
   }
 
-  let getCountFilter = await runQuery(sql_count + u, search_param);
+  let getCountFilter = await runQuery(sql_count + u + c, search_param);
   total_filter =
     getCountFilter[0] !== undefined ? getCountFilter[0]?.numRows : 0;
 
