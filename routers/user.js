@@ -75,6 +75,7 @@ if(data.verify_account == 'system_unactive'){
       `%${search}%`,
       `%${search}%`,
       `%${search}%`,
+      `%${search}%`,
     ];
   }
 
