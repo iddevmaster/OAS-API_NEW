@@ -108,7 +108,7 @@ if(data.verify_account == 'system_unactive'){
   }else if(_check_user[0].user_type == '2') {
   
     let sql =
-    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1";
+    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1 AND A.user_type =3";
 
   if (_check_user[0].location_id) {
     let user_type = _check_user[0].location_id;
