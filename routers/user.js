@@ -1707,10 +1707,16 @@ router.post("/checkuserpopulation", middleware, async (req, res, next) => {
       [data.user_phone]
     );
   
-    let checkEmail = await runQuery(
-      "SELECT * FROM app_user WHERE user_email =? AND cancelled=1",
-      [data.email]
-    );
+    if(data.user_email){
+      let checkEmail = await runQuery(
+        "SELECT * FROM app_user WHERE user_email =? AND cancelled=1",
+        [data.user_email]
+      );
+      if (checkEmail.length > 0) {
+        datas.checkemail = true
+      }
+    }
+
     let checkUser = await runQuery(
       "SELECT * FROM app_user WHERE user_name =? AND cancelled=1",
       [data.username]
@@ -1723,9 +1729,7 @@ router.post("/checkuserpopulation", middleware, async (req, res, next) => {
     if (checkPhone.length > 0) {
       datas.checkphone = true
     }
-    if (checkEmail.length > 0) {
-      datas.checkemail = true
-    }
+   
     if (checkUser.length > 0) {
       datas.checkusername = true
     }
