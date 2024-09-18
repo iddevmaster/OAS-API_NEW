@@ -833,6 +833,118 @@ router.put("/update/:user_id", middleware, async (req, res, next) => {
   }
 });
 
+
+router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
+  const { user_id } = req.params;
+  const data = req.body;
+  const user_name = data.username;
+  const user_password = data.user_password;
+  const user_phone = data.user_phone;
+  const user_email = data.user_email;
+  const user_type = data.user_type;
+  const identification_number = data.identification_number;
+
+
+  // // ตรวจสอบว่ามี  user_id อยู่นี้หรือไม่
+  let _check_user = await runQuery(
+    "SELECT A.user_name,A.user_email,A.user_phone,B.identification_number FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.user_id != ?",
+    [user_id]
+  );
+
+  // console.log(_check_user);
+  if (_check_user.length <= 0) {
+    return res.status(204).json({
+      status: 204,
+      message: "Username Error", // error.sqlMessage
+    });
+  }
+
+  // ตรวจสอบว่ามี user_name ,email และเบอร์โทรนี้หรือไม่
+
+
+  
+  if (user_email !==  "") {
+    let _check_users = await runQuery(
+      "SELECT A.user_name,A.user_email,A.user_phone,B.identification_number FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id where A.user_id != ? AND (B.identification_number = ? OR A.user_name = ? OR A.user_phone = ? OR A.user_email = ?)",
+      [user_id,identification_number,user_name,user_phone,user_email]
+    );
+    console.log('if1',_check_users);
+    if (_check_users.length >= 1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Username Error", // error.sqlMessage
+      });
+    }
+  } else if (user_email === "") {
+    
+    console.log('if2');
+    let _check_users = await runQuery(
+      "SELECT A.user_name,A.user_email,A.user_phone,B.identification_number FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id where A.user_id != ? AND (B.identification_number = ? OR A.user_name = ? OR A.user_phone = ?)",
+      [user_id,identification_number,user_name,user_phone]
+    );
+
+    if (_check_users.length >= 1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Username Error", // error.sqlMessage
+      });
+    }
+    
+  } 
+
+  if (user_password !== "") {
+    console.log('if1 user_password')
+    // bcrypt
+    //   .hash(user_password, numSaltRounds)
+    //   .then((hash) => {
+    //     let passHash = hash;
+    //     con.query(
+    //       "UPDATE  app_user SET user_name=? , user_password=? ,user_prefrix=?, user_firstname=? ,user_lastname=? ,user_email=? ,user_phone=? ,user_type=?,active=?, udp_date=? WHERE user_id=? ",
+    //       [
+    //         user_name,
+    //         passHash,
+    //         data.user_prefrix,
+    //         data.user_firstname,
+    //         data.user_lastname,
+    //         user_email,
+    //         user_phone,
+    //         data.user_type,
+    //         data.active,
+    //         functions.dateAsiaThai(),
+    //         user_id,
+    //       ],
+    //       function (err, result) {
+    //         if (err) throw err;
+    //         return res.json(result);
+    //       }
+    //     );
+    //   })
+    //   .catch((err) => console.error(err.message));
+  } else {
+    con.query(
+      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=? WHERE A.user_id=? ",
+      [
+        data.username,
+        data.user_prefrix,
+        data.first_name,
+        data.last_name,
+        user_email,
+        user_phone,
+        data.user_type,
+        data.active,
+        functions.dateAsiaThai(),
+        user_id,
+      ],
+      function (err, result) {
+        if (err) throw err;
+        return res.json(result);
+      }
+    );
+    console.log('if2 user_password')
+  }
+});
+
+
 router.get("/get/:user_id", middleware, async (req, res, next) => {
   const { user_id } = req.params;
   let sql = `SELECT 
