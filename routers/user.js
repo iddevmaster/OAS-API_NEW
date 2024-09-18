@@ -383,7 +383,6 @@ router.post("/list/get", middleware, async (req, res, next) => {
     return res.json(datauser);
   }
  
-
   let datastype = check_user[0].user_type;
   if(datastype == 1){  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 1
     let datauser = await runQuery(
@@ -391,7 +390,7 @@ router.post("/list/get", middleware, async (req, res, next) => {
       [data.user_search_id]
     );
     return res.json(datauser);
-  }else if(datastype == 2){  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 2
+  }else if(datastype == 2){  /////////////////////////////  เช็ค Staff ว่าเป็นระดับ 2
 
 
       /////////////////////////////  เช็ค User ประชาชนว่า มีรึไหม
@@ -459,6 +458,43 @@ router.post("/list/get/profile", middleware, async (req, res, next) => {
   }
 
  
+
+});
+
+
+router.post("/list/getone/profile", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  /////////////////////////////////////////////// เช็ค Group User
+
+  let check_user = await runQuery(
+    "SELECT A.*,B.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id  WHERE A.user_id= ?",
+    [data.user_id]
+  );
+
+
+  if (check_user.length == 0) {
+    let datauser = [];
+    return res.json(datauser);
+  }
+ 
+ 
+  let datastype = check_user[0].user_type;
+ 
+  if(datastype == 3){  
+    let datauser = await runQuery(
+      "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ?",
+      [data.user_id]
+    );
+
+    return res.json(datauser);
+  }else {
+    let datauser = await runQuery(
+      "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ?",
+      [data.user_id]
+    );
+    return res.json(datauser);
+  }
 
 });
 
