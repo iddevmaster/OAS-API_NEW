@@ -17,7 +17,7 @@ async function runQuery(sql, param) {
 
 router.post("/list?", middleware, async (req, res, next) => {
   const data = req.body;
-  console.log(data);
+
   const current_page = data.page;
   const per_page = data.per_page <= 50 ? data.per_page : 50;
   const search = data.search;
@@ -27,7 +27,16 @@ router.post("/list?", middleware, async (req, res, next) => {
   let search_param = [];
   let u = "";
   let c = "";
-  let sql =
+
+////////////////////check user type
+  let _check_user = await runQuery(
+    "SELECT A.user_id,A.user_type,B.location_id FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.user_id = ?",
+    [data.user_id]
+  );
+
+ 
+  if(_check_user[0].user_type == '1'){
+    let sql =
     "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1";
 
   if (req.query.user_type) {
@@ -95,6 +104,84 @@ if(data.verify_account == 'system_unactive'){
     data: getContent, // รายการข้อมูล
   };
   return res.json(response);
+  
+  }else if(_check_user[0].user_type == '2') {
+    let sql =
+    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1";
+
+  if (_check_user[0].location_id) {
+    let user_type = _check_user[0].location_id;
+    u = " AND B.location_id =  " + user_type; // ประเภท User
+    sql += u;
+  }
+
+  if (data.verify_account) {
+if(data.verify_account == 'system_active'){
+  c = " AND B.verify_account = 'system_active'"; 
+  sql += c;
+
+}
+if(data.verify_account == 'phone_active'){
+  c = " AND B.verify_account = 'phone_active'"; 
+  sql += c;
+}
+if(data.verify_account == 'unactive'){
+  c = " AND B.verify_account = 'unactive'"; 
+  sql += c;
+}
+
+if(data.verify_account == 'system_unactive'){
+  c = " AND B.verify_account = 'system_unactive'"; 
+  sql += c;
+}
+
+
+  }
+
+  let sql_count =
+    " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE  cancelled=1 ";
+  let getCountAll = await runQuery(sql_count + u + c);
+  total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
+
+  if (search !== "" || search.length > 0) {
+    // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
+    let q = ` AND (A.user_name  LIKE ? OR A.user_firstname  LIKE  ? OR A.user_lastname  LIKE  ? OR A.user_email  LIKE  ? OR A.user_phone  LIKE  ? OR B.identification_number LIKE  ?)`; //
+    sql += q;
+    sql_count += q;
+    search_param = [
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+    ];
+  }
+
+  let getCountFilter = await runQuery(sql_count + u + c, search_param);
+  total_filter =
+    getCountFilter[0] !== undefined ? getCountFilter[0]?.numRows : 0;
+
+  sql += `  ORDER BY user_id DESC LIMIT ${offset},${per_page} `;
+  let getContent = await runQuery(sql, search_param);
+  const response = {
+    total: total, // จำนวนรายการทั้งหมด
+    total_filter: total_filter, // จำนวนรายการทั้งหมด
+    current_page: current_page, // หน้าที่กำลังแสดงอยู่
+    limit_page: per_page, // limit data
+    total_page: Math.ceil(total_filter / per_page), // จำนวนหน้าทั้งหมด
+    search: search, // คำค้นหา
+    data: getContent, // รายการข้อมูล
+  };
+  return res.json(response);
+  
+  }else {
+    const response = {
+      data: [], // รายการข้อมูล
+    };
+      return res.json(response);
+  }
+
 });
 
 
