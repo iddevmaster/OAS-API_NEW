@@ -884,8 +884,8 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
     );
 
     if (_check_users.length >= 1) {
-      return res.status(404).json({
-        status: 404,
+      return res.status(204).json({
+        status: 204,
         message: "Username Error", // error.sqlMessage
       });
     }
