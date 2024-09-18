@@ -106,6 +106,7 @@ if(data.verify_account == 'system_unactive'){
   return res.json(response);
   
   }else if(_check_user[0].user_type == '2') {
+  
     let sql =
     "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1";
 
@@ -143,6 +144,8 @@ if(data.verify_account == 'system_unactive'){
   let getCountAll = await runQuery(sql_count + u + c);
   total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
 
+  
+
   if (search !== "" || search.length > 0) {
     // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
     let q = ` AND (A.user_name  LIKE ? OR A.user_firstname  LIKE  ? OR A.user_lastname  LIKE  ? OR A.user_email  LIKE  ? OR A.user_phone  LIKE  ? OR B.identification_number LIKE  ?)`; //
@@ -159,8 +162,12 @@ if(data.verify_account == 'system_unactive'){
   }
 
   let getCountFilter = await runQuery(sql_count + u + c, search_param);
+  
+ 
+
   total_filter =
     getCountFilter[0] !== undefined ? getCountFilter[0]?.numRows : 0;
+
 
   sql += `  ORDER BY user_id DESC LIMIT ${offset},${per_page} `;
   let getContent = await runQuery(sql, search_param);
