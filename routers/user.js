@@ -1791,7 +1791,7 @@ router.post("/createuserpopulation", middleware, async (req, res, next) => {
              data.user_address,
              data.user_village,
              data.location_id,
-             33,
+             data.country_id,
              data.passpost_image,
              data.real_image,
              "Y",
