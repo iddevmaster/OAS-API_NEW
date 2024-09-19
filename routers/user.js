@@ -868,7 +868,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
       "SELECT A.user_name,A.user_email,A.user_phone,B.identification_number FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id where A.user_id != ? AND (B.identification_number = ? OR A.user_name = ? OR A.user_phone = ? OR A.user_email = ?)",
       [user_id,identification_number,user_name,user_phone,user_email]
     );
-    console.log('if1',_check_users);
+ 
     if (_check_users.length >= 1) {
       return res.status(404).json({
         status: 404,
@@ -877,7 +877,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
     }
   } else if (user_email === "") {
     
-    console.log('if2');
+ 
     let _check_users = await runQuery(
       "SELECT A.user_name,A.user_email,A.user_phone,B.identification_number FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id where A.user_id != ? AND (B.identification_number = ? OR A.user_name = ? OR A.user_phone = ?)",
       [user_id,identification_number,user_name,user_phone]
@@ -922,7 +922,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
     //   .catch((err) => console.error(err.message));
   } else {
     con.query(
-      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=? WHERE A.user_id=? ",
+      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email=?,B.verify_account WHERE A.user_id=? ",
       [
         data.username,
         data.user_prefrix,
@@ -933,6 +933,8 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
         data.user_type,
         data.active,
         functions.dateAsiaThai(),
+        data.user_email,
+        data.verify_account,
         user_id,
       ],
       function (err, result) {
