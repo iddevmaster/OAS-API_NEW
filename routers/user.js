@@ -922,10 +922,11 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
     //   .catch((err) => console.error(err.message));
   } else {
     con.query(
-      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? WHERE A.user_id=? ",
+      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? WHERE A.user_id=? ",
       [
         data.username,
         data.user_prefrix,
+        data.full_name,
         data.first_name,
         data.last_name,
         user_email,
@@ -942,7 +943,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
         return res.json(result);
       }
     );
-    console.log('if2 user_password')
+  
   }
 });
 
