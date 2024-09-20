@@ -894,32 +894,41 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
 
   if (user_password !== "") {
     console.log('if1 user_password')
-    // bcrypt
-    //   .hash(user_password, numSaltRounds)
-    //   .then((hash) => {
-    //     let passHash = hash;
-    //     con.query(
-    //       "UPDATE  app_user SET user_name=? , user_password=? ,user_prefrix=?, user_firstname=? ,user_lastname=? ,user_email=? ,user_phone=? ,user_type=?,active=?, udp_date=? WHERE user_id=? ",
-    //       [
-    //         user_name,
-    //         passHash,
-    //         data.user_prefrix,
-    //         data.user_firstname,
-    //         data.user_lastname,
-    //         user_email,
-    //         user_phone,
-    //         data.user_type,
-    //         data.active,
-    //         functions.dateAsiaThai(),
-    //         user_id,
-    //       ],
-    //       function (err, result) {
-    //         if (err) throw err;
-    //         return res.json(result);
-    //       }
-    //     );
-    //   })
-    //   .catch((err) => console.error(err.message));
+    bcrypt
+      .hash(user_password, numSaltRounds)
+      .then((hash) => {
+        let passHash = hash;
+        con.query(
+          "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_type=? ,A.user_password=? ,A.active=? ,A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,B.user_birthday=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? ,B.exp_date =? ,B.passpost_image =? ,B.real_image =? WHERE A.user_id=? ",
+          [
+            user_type,
+            passHash,
+            data.active,
+            data.username,
+            data.user_prefrix,
+            data.full_name,
+            data.first_name,
+            data.last_name,
+            data.user_birthday,
+            user_email,
+            user_phone,
+            data.user_type,
+            data.active,
+            functions.dateAsiaThai(),
+            data.user_email,
+            data.verify_account,
+            data.expire,
+            data.passpost_image,
+            data.real_image,
+            user_id,
+          ],
+          function (err, result) {
+            if (err) throw err;
+            return res.json(result);
+          }
+        );
+      })
+      .catch((err) => console.error(err.message));
   } else {
     console.log('if2 user_password')
     con.query(
