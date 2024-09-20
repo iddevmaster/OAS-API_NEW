@@ -629,9 +629,11 @@ router.post("/updatedata/log", middleware, async (req, res, next) => {
   const data = req.body;
 
   let result = await runQuery(
-    "INSERT INTO app_log_update_data (user_id,update_data,udp_date) VALUES (?,?,?)",
+    "INSERT INTO app_log_update_data (user_id,create_id,des,update_data,udp_date) VALUES (?,?,?,?,?)",
     [
       data.user_id,
+      data.user_admin,
+      data.des,
       functions.dateAsiaThai(),
       functions.dateAsiaThai(),
     ]
