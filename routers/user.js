@@ -934,7 +934,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
   } else {
     console.log('if2 user_password')
     con.query(
-      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_type=? ,A.active=? ,A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,B.user_birthday=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? ,B.exp_date =? ,B.passpost_image =? ,B.real_image =? WHERE A.user_id=? ",
+      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_type=? ,A.active=? ,A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,B.user_birthday=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? ,B.exp_date =? ,B.passpost_image =? ,B.real_image =?, B.user_address =?, B.user_village =?  WHERE A.user_id=? ",
       [
         user_type,
         data.active,
@@ -954,6 +954,8 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
         data.expire,
         data.passpost_image,
         data.real_image,
+        data.user_address,
+        data.user_village,
         user_id,
       ],
       function (err, result) {
