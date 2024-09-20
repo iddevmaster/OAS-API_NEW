@@ -923,7 +923,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
   } else {
     console.log('if2 user_password')
     con.query(
-      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? ,B.exp_date =? WHERE A.user_id=? ",
+      "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,A.user_email=? ,A.user_phone=? ,A.user_type=?,A.active=?, A.udp_date=?,A.user_email =?,B.verify_account =? ,B.exp_date =? ,B.passpost_image =? ,B.real_image =? WHERE A.user_id=? ",
       [
         data.username,
         data.user_prefrix,
@@ -938,6 +938,8 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
         data.user_email,
         data.verify_account,
         data.expire,
+        data.passpost_image,
+        data.real_image,
         user_id,
       ],
       function (err, result) {
