@@ -617,8 +617,8 @@ router.post("/log/updatedata", middleware, async (req, res, next) => {
   const data = req.body;
 
   let getContent = await runQuery(
-    "SELECT * from app_log_update_data WHERE user_id =? ORDER BY log_id DESC LIMIT 1",
-    [data.user_id]
+    "SELECT * from app_log_update_data WHERE user_id =? AND type =? ORDER BY log_id DESC LIMIT 1",
+    [data.user_id,data.type]
   );
   const response = getContent;
   return res.json(response);
