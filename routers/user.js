@@ -625,6 +625,31 @@ router.post("/log/updatedata", middleware, async (req, res, next) => {
 });
 
 
+router.post("/update/status", middleware, async (req, res, next) => {
+  const data = req.body;
+
+
+  let result = await runQuery(
+    "INSERT INTO app_comment_card (comment_details,user_id,crt_date,udp_date,user_crt) VALUES (?,?,?,?,?)",
+    [
+      data.comment_details,
+      data.user_id,
+      functions.dateAsiaThai(),
+      functions.dateAsiaThai(),
+      data.user_admin,
+    ]
+  );
+
+  let result_update = await runQuery("UPDATE app_user_detail SET verify_account =? WHERE user_id=? ",
+    [verify_account,user_id],
+  );
+
+  return res.status(200).json({
+    status: true,
+  });
+});
+
+
 router.post("/updatedata/log", middleware, async (req, res, next) => {
   const data = req.body;
 
@@ -1552,7 +1577,6 @@ router.post("/update/approve/pedding", middleware, async (req, res, next) => {
   return res.status(200).json({
     status: true,
   });
-
 });
 
 router.post("/update/before", middleware, async (req, res, next) => {
