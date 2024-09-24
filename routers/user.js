@@ -483,14 +483,14 @@ router.post("/list/getone/profile", middleware, async (req, res, next) => {
  
   if(datastype == 1){  
     let datauser = await runQuery(
-      "SELECT A.*,B.*,C.*,D.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id LEFT JOIN app_country D ON D.id = B.country_id WHERE A.user_id= ?",
+      "SELECT A.*,B.*,C.*,D.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id LEFT JOIN app_country D ON D.country_id = B.country_id WHERE A.user_id= ?",
       [data.user_search_id]
     );
 
     return res.json(datauser);
   }else if(datastype == 2) {
     let datauser = await runQuery(
-      "SELECT A.*,B.*,C.*,D.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id LEFT JOIN app_country D ON D.id = B.country_id WHERE A.user_id= ?",
+      "SELECT A.*,B.*,C.*,D.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id LEFT JOIN app_country D ON D.country_id = B.country_id WHERE A.user_id= ?",
       [data.user_search_id]
     );
     return res.json(datauser);
