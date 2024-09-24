@@ -617,7 +617,7 @@ router.post("/log/updatedata", middleware, async (req, res, next) => {
   const data = req.body;
 
   let getContent = await runQuery(
-    "SELECT A.*,B.* from app_log_update_data A LEFT JOIN app_user B ON A.user_id = B.user_id WHERE A.user_id =? AND A.type =? ORDER BY log_id DESC LIMIT 1",
+    "SELECT A.*,B.* from app_log_update_data A LEFT JOIN app_user B ON A.create_id = B.user_id WHERE A.user_id =? AND A.type =? ORDER BY log_id DESC LIMIT 1",
     [data.user_id,data.type]
   );
   const response = getContent;
@@ -643,6 +643,8 @@ router.post("/update/status", middleware, async (req, res, next) => {
   let result_update = await runQuery("UPDATE app_user_detail SET verify_account =? WHERE user_id=? ",
     [data.verify_account,data.user_id],
   );
+
+  console.log(data.verify_account);
 
   return res.status(200).json({
     status: true,
