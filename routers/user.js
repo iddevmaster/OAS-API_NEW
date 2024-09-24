@@ -641,7 +641,7 @@ router.post("/update/status", middleware, async (req, res, next) => {
   );
 
   let result_update = await runQuery("UPDATE app_user_detail SET verify_account =? WHERE user_id=? ",
-    [verify_account,user_id],
+    [data.verify_account,data.user_id],
   );
 
   return res.status(200).json({
