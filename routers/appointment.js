@@ -269,6 +269,8 @@ router.get("/event", middleware, (req, res, next) => {
   let dlt_code = req.query.dlt_code;
   const present_day = new Date().toISOString().split("T")[0];
 
+  console.log(present_day);
+
   con.query(
     "SELECT  DATE_FORMAT(ap_date_start,'%Y-%m-%d') AS event   FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND DATE(ap_date_start) > ? GROUP BY event ORDER BY event ASC LIMIT 0,30",
     [ap_learn_type, dlt_code, present_day],
@@ -535,6 +537,17 @@ router.get("/reserve/list?", middleware, (req, res, next) => {
     }
   );
 });
+
+router.post("/dateappointment", middleware, async (req, res, next) => {
+
+obj = [];
+
+let sql = `SELECT * from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE DATE(B.ap_date_first) = '2024-10-04'`;
+
+let getContent = await runQuery(sql);
+  return res.json(getContent);
+});
+
 //
 
 module.exports = router;
