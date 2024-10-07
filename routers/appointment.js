@@ -360,6 +360,26 @@ router.post("/reserve/create", middleware, async (req, res, next) => {
   );
   return res.json(_content);
 });
+
+
+router.post("/reserve/new/create", middleware, async (req, res, next) => {
+  const data = req.body;
+  const user_id = data.user_id;
+  const ap_id = data.ap_id;
+const a = [];
+const test = functions.DigitRandom();
+
+
+let _content = await runQuery(
+  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date) VALUES (?,?,?,?)",
+  [ap_id, user_id ,test, functions.dateAsiaThai()]
+);
+
+
+
+return res.json(_content);
+});
+
 router.delete("/reserve/delete/:ar_id", middleware, (req, res, next) => {
   const { ar_id } = req.params;
   const present_day = new Date().toISOString().split("T")[0];
@@ -384,6 +404,9 @@ router.delete("/reserve/delete/:ar_id", middleware, (req, res, next) => {
     }
   );
 });
+
+
+
 
 router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
   const { user_id } = req.params;
@@ -542,7 +565,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
 
 obj = [];
 
-let sql = `SELECT * from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE DATE(B.ap_date_first) = '2024-10-04'`;
+let sql = `SELECT * from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE DATE(B.ap_date_first) = '2024-10-07'`;
 
 let getContent = await runQuery(sql);
   return res.json(getContent);

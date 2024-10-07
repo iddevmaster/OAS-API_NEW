@@ -66,5 +66,25 @@ f.treeDigit = (number) => {
   return formattedNum;
 };
 
+f.DigitRandom = () => {
+  let result = '';
+  let result2 = '';
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const charactersLength = characters.length;
+let counter = 0;
+while (counter < 6) {
+  result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  counter += 1;
+}
+
+const characters2 = '0123456789';
+const charactersLength2 = characters2.length;
+let counter2 = 0;
+while (counter2 < 2) {
+  result2 += characters2.charAt(Math.floor(Math.random() * charactersLength2));
+  counter2 += 1;
+}
+return result+result2;
+};
 
 module.exports = f;
