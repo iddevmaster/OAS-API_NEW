@@ -571,6 +571,17 @@ let getContent = await runQuery(sql);
   return res.json(getContent);
 });
 
+////////////ค้นหาหมายเลขนัดหมาย
+router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => {
+
+  const data = req.body;
+  
+  // let sql = `SELECT * from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id  
+  // LEFT JOIN app_user C ON A.user_id = C.user_id WHERE DATE(B.ap_date_first) = '2024-10-07'`;
+  // let getContent = await runQuery(sql);
+    return res.json(data);
+  });
+
 //
 
 module.exports = router;
