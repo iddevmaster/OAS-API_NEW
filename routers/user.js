@@ -644,7 +644,7 @@ router.post("/update/status", middleware, async (req, res, next) => {
     [data.verify_account,data.user_id],
   );
 
-  console.log(data.verify_account);
+
 
   return res.status(200).json({
     status: true,

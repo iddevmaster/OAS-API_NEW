@@ -316,6 +316,19 @@ router.get("/main/get/:em_id", middleware, (req, res, next) => {
   );
 });
 
+
+router.post("/main/get/one", middleware, async (req, res, next) => {
+
+  const course_code = data.course_code;
+  const getCourseGroup = await runQuery(
+    "SELECT * from app_exam_main A LEFT JOIN app_course B ON B.course_id = A.course_id WHERE B.course_code = ? LIMIT 1",
+    [course_code]
+  );
+
+  return res.json(getCourseGroup);
+ 
+});
+
 router.post("/question/create", middleware, async (req, res, next) => {
   const data = req.body;
 
@@ -994,6 +1007,19 @@ router.get("/history?", middleware, async (req, res, next) => {
     p.concat(p2)
   );
   return res.json(getResultExamHistory);
+});
+
+
+router.post("/history/ex", middleware, async (req, res, next) => {
+  const course_id = req.course_id;
+  const user_id = req.user_id;
+
+  let sql = `SELECT MAX(er_score_total),er_question_total
+  FROM  app_exam_result 
+  WHERE  user_id = ? AND course_id = ? LIMIT 1`;
+
+  const getCountAll = await runQuery(sql, user_id,user_id);
+  return res.json(getCountAll);
 });
 
 router.post("/history/all/:course_id", middleware, async (req, res, next) => {
