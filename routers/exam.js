@@ -321,7 +321,7 @@ router.post("/main/get/one", middleware, async (req, res, next) => {
   const data = req.body;
   const course_code = data.course_code;
   const getCourseGroup = await runQuery(
-    "SELECT (SELECT SUM(app_course_cluster.cg_amount_random) FROM app_course_cluster WHERE app_course_cluster.course_id=app_exam_main.course_id )  AS total_question   FROM app_exam_main INNER JOIN  app_course uc ON uc.course_id = app_exam_main.course_id  AND uc.active = 1  LEFT JOIN  app_user u1 ON u1.user_id = app_exam_main.user_crt   LEFT JOIN  app_user u2 ON u2.user_id = app_exam_main.user_udp WHERE app_exam_main.cancelled=1 AND app_exam_main.em_code = ? LIMIT 1",
+    "SELECT app_exam_main.em_measure,(SELECT SUM(app_course_cluster.cg_amount_random) FROM app_course_cluster WHERE app_course_cluster.course_id=app_exam_main.course_id )  AS total_question   FROM app_exam_main INNER JOIN  app_course uc ON uc.course_id = app_exam_main.course_id  AND uc.active = 1  LEFT JOIN  app_user u1 ON u1.user_id = app_exam_main.user_crt   LEFT JOIN  app_user u2 ON u2.user_id = app_exam_main.user_udp WHERE app_exam_main.cancelled=1 AND app_exam_main.em_code = ? LIMIT 1",
     [course_code]
   );
 
