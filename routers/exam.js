@@ -318,7 +318,7 @@ router.get("/main/get/:em_id", middleware, (req, res, next) => {
 
 
 router.post("/main/get/one", middleware, async (req, res, next) => {
-
+  const data = req.body;
   const course_code = data.course_code;
   const getCourseGroup = await runQuery(
     "SELECT * from app_exam_main A LEFT JOIN app_course B ON B.course_id = A.course_id WHERE B.course_code = ? LIMIT 1",
