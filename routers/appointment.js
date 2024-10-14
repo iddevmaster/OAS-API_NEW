@@ -571,6 +571,13 @@ let getContent = await runQuery(sql);
   return res.json(getContent);
 });
 
+////////////ยกเลิกนัดหมาย
+router.post("/cancelapp", middleware, async (req, res, next) => {
+  const data = req.body;
+  const response = [];
+  return res.json(data);
+  });
+
 ////////////ค้นหาหมายเลขนัดหมาย
 router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => {
 
