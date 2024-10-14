@@ -579,9 +579,8 @@ router.post("/cancelapp", middleware, async (req, res, next) => {
     "UPDATE app_appointment_reserve SET status=?,remark=? WHERE ap_number=?",
     [
       "C",
-      data.mr_learn_type,
       data.remark,
-      ap_number
+      data.ap_number
     ],
     function (err, result) {
       if (err) throw err;
