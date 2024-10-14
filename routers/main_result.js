@@ -12,6 +12,7 @@ router.post("/create", middleware, (req, res, next) => {
   const dlt_code = data.dlt_code;
   const mr_status = data.mr_status;
   const obj = common.drivinglicense_type;
+  const user_id_staff = data.user_id_staff;
   const result_filter = obj.filter(function (e) {
     return e.dlt_code === dlt_code;
   });
@@ -40,7 +41,7 @@ router.post("/create", middleware, (req, res, next) => {
       }
       let user_id = rows[0]?.user_id;
       con.query(
-        "INSERT INTO app_main_result (mr_score,mr_learn_type,mr_status,dlt_code,crt_date,udp_date,user_id) VALUES (?,?,?,?,?,?,?)",
+        "INSERT INTO app_main_result (mr_score,mr_learn_type,mr_status,dlt_code,crt_date,udp_date,user_id,user_create) VALUES (?,?,?,?,?,?,?,?)",
         [
           data.mr_score,
           data.mr_learn_type,
@@ -49,6 +50,7 @@ router.post("/create", middleware, (req, res, next) => {
           functions.dateAsiaThai(),
           functions.dateAsiaThai(),
           user_id,
+          user_id_staff
         ],
         function (err, result) {
           if (err) throw err;
@@ -66,6 +68,7 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
   const dlt_code = data.dlt_code;
   const mr_status = data.mr_status;
   const obj = common.drivinglicense_type;
+  const user_id_staff = data.user_id_staff;
   const result_filter = obj.filter(function (e) {
     return e.dlt_code === dlt_code;
   });
@@ -95,7 +98,7 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
       }
       let user_id = rows[0]?.user_id;
       con.query(
-        "UPDATE  app_main_result SET mr_score=?,mr_learn_type=?,mr_status=?,dlt_code=?,udp_date=? ,user_id=? WHERE mr_id=?",
+        "UPDATE  app_main_result SET mr_score=?,mr_learn_type=?,mr_status=?,dlt_code=?,udp_date=? ,user_id=? ,user_create=? WHERE mr_id=?",
         [
           data.mr_score,
           data.mr_learn_type,
@@ -104,6 +107,7 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
           functions.dateAsiaThai(),
           user_id,
           mr_id,
+          user_id_staff
         ],
         function (err, result) {
           if (err) throw err;
