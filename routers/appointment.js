@@ -371,8 +371,8 @@ const test = functions.DigitRandom();
 
 
 let _content = await runQuery(
-  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date) VALUES (?,?,?,?)",
-  [ap_id, user_id ,test, functions.dateAsiaThai()]
+  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,status) VALUES (?,?,?,?,?)",
+  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y']
 );
 
 
