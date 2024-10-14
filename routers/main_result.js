@@ -147,7 +147,7 @@ router.delete("/delete/:mr_id", middleware, (req, res, next) => {
 router.get("/list?", middleware, (req, res, next) => {
   const user_id = req.query.user_id;
   con.query(
-    " SELECT  *  FROM app_main_result WHERE user_id  = ? ORDER BY mr_id DESC ",
+    "SELECT  *  FROM app_main_result A LEFT JOIN app_user B ON A.user_create = B.user_id WHERE user_id  = ? ORDER BY mr_id DESC",
     [user_id],
     (err, rows) => {
       return res.json(rows);
