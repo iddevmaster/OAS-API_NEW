@@ -574,8 +574,21 @@ let getContent = await runQuery(sql);
 ////////////ยกเลิกนัดหมาย
 router.post("/cancelapp", middleware, async (req, res, next) => {
   const data = req.body;
-  const response = [];
-  return res.json(data);
+
+  con.query(
+    "UPDATE app_appointment_reserve SET status=?,remark=? WHERE ap_number=?",
+    [
+      "C",
+      data.mr_learn_type,
+      data.remark,
+      ap_number
+    ],
+    function (err, result) {
+      if (err) throw err;
+      return res.json(result);
+    }
+  );
+
   });
 
 ////////////ค้นหาหมายเลขนัดหมาย
