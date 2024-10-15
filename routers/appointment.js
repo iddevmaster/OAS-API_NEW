@@ -355,8 +355,8 @@ router.post("/reserve/create", middleware, async (req, res, next) => {
   }
   // บันทึกการนัดหมาย
   let _content = await runQuery(
-    "INSERT INTO app_appointment_reserve (ap_id,user_id,udp_date) VALUES (?,?,?)",
-    [ap_id, user_id, functions.dateAsiaThai()]
+    "INSERT INTO app_appointment_reserve (ap_id,user_id,udp_date,app_status) VALUES (?,?,?,?)",
+    [ap_id, user_id, functions.dateAsiaThai(),'Y']
   );
   return res.json(_content);
 });
@@ -371,7 +371,7 @@ const test = functions.DigitRandom();
 
 
 let _content = await runQuery(
-  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,status) VALUES (?,?,?,?,?)",
+  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status) VALUES (?,?,?,?,?)",
   [ap_id, user_id ,test, functions.dateAsiaThai(),'Y']
 );
 
@@ -576,7 +576,7 @@ router.post("/cancelapp", middleware, async (req, res, next) => {
   const data = req.body;
 
   con.query(
-    "UPDATE app_appointment_reserve SET status=?,remark=? WHERE ap_number=?",
+    "UPDATE app_appointment_reserve SET app_status=?,remark=? WHERE ap_number=?",
     [
       "C",
       data.remark,
