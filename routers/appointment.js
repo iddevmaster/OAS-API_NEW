@@ -564,8 +564,10 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
 
 obj = [];
 
-let sql = `SELECT * from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id  
-LEFT JOIN app_user C ON A.user_id = C.user_id WHERE DATE(B.ap_date_first) = '2024-10-14'`;
+let sql = `SELECT A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name from app_appointment_reserve A
+LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
+LEFT JOIN app_user C ON C.user_id = A.user_id
+WHERE DATE(B.ap_date_first) = '2024-10-14'`;
 let getContent = await runQuery(sql);
   return res.json(getContent);
 });
