@@ -113,9 +113,10 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
           functions.dateAsiaThai(),
           user_id,
           user_id_staff,
-          mr_id,
           data.ref_number,
-          data.remark
+          data.remark,
+          mr_id,
+     
         ],
         function (err, result) {
           if (err) throw err;
