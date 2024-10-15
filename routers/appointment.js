@@ -269,7 +269,6 @@ router.get("/event", middleware, (req, res, next) => {
   let dlt_code = req.query.dlt_code;
   const present_day = new Date().toISOString().split("T")[0];
 
-  console.log(present_day);
 
   con.query(
     "SELECT  DATE_FORMAT(ap_date_start,'%Y-%m-%d') AS event   FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND DATE(ap_date_start) > ? GROUP BY event ORDER BY event ASC LIMIT 0,30",
@@ -606,7 +605,7 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
     [data.ap_number]
   );
 
-console.log(getContent);
+
   const response = getContent;
   return res.json(response);
 
