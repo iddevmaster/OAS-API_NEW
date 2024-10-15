@@ -11,6 +11,8 @@ router.post("/create", middleware, (req, res, next) => {
   const identification_number = data.identification_number;
   const dlt_code = data.dlt_code;
   const mr_status = data.mr_status;
+  const ref_number = data.ref_number;
+  const remark = data.remark;
   const obj = common.drivinglicense_type;
   const user_id_staff = data.user_id_staff;
   const result_filter = obj.filter(function (e) {
@@ -41,7 +43,7 @@ router.post("/create", middleware, (req, res, next) => {
       }
       let user_id = rows[0]?.user_id;
       con.query(
-        "INSERT INTO app_main_result (mr_score,mr_learn_type,mr_status,dlt_code,crt_date,udp_date,user_id,user_create) VALUES (?,?,?,?,?,?,?,?)",
+        "INSERT INTO app_main_result (mr_score,mr_learn_type,mr_status,dlt_code,crt_date,udp_date,user_id,user_create,ref_number,remark) VALUES (?,?,?,?,?,?,?,?,?,?)",
         [
           data.mr_score,
           data.mr_learn_type,
@@ -50,7 +52,9 @@ router.post("/create", middleware, (req, res, next) => {
           functions.dateAsiaThai(),
           functions.dateAsiaThai(),
           user_id,
-          user_id_staff
+          user_id_staff,
+          ref_number,
+          remark,
         ],
         function (err, result) {
           if (err) throw err;
@@ -69,6 +73,8 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
   const mr_status = data.mr_status;
   const obj = common.drivinglicense_type;
   const user_id_staff = data.user_id_staff;
+  const ref_number = data.ref_number;
+  const remark = data.remark;
   const result_filter = obj.filter(function (e) {
     return e.dlt_code === dlt_code;
   });
@@ -98,7 +104,7 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
       }
       let user_id = rows[0]?.user_id;
       con.query(
-        "UPDATE  app_main_result SET mr_score=?,mr_learn_type=?,mr_status=?,dlt_code=?,udp_date=? ,user_id=? ,user_create=? WHERE mr_id=?",
+        "UPDATE  app_main_result SET mr_score=?,mr_learn_type=?,mr_status=?,dlt_code=?,udp_date=? ,user_id=? ,user_create=?,ref_number=?,remark=? WHERE mr_id=?",
         [
           data.mr_score,
           data.mr_learn_type,
@@ -107,7 +113,9 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
           functions.dateAsiaThai(),
           user_id,
           user_id_staff,
-          mr_id
+          mr_id,
+          ref_number,
+          remark
         ],
         function (err, result) {
           if (err) throw err;
