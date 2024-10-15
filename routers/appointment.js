@@ -606,7 +606,7 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
     [data.ap_number]
   );
 
-
+console.log(getContent);
   const response = getContent;
   return res.json(response);
 
