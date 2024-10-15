@@ -104,7 +104,7 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
       }
       let user_id = rows[0]?.user_id;
       con.query(
-        "UPDATE  app_main_result SET mr_score=?,mr_learn_type=?,mr_status=?,dlt_code=?,udp_date=? ,user_id=? ,user_create=?,ref_number=?,remark=? WHERE mr_id=?",
+        "UPDATE  app_main_result SET mr_score=?,mr_learn_type=?,mr_status=?,dlt_code=?,udp_date=?,user_id=?,user_create=?,ref_number=?,remark=? WHERE mr_id=?",
         [
           data.mr_score,
           data.mr_learn_type,
@@ -114,8 +114,8 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
           user_id,
           user_id_staff,
           mr_id,
-          ref_number,
-          remark
+          data.ref_number,
+          data.remark
         ],
         function (err, result) {
           if (err) throw err;
