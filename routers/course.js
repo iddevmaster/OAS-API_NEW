@@ -1488,4 +1488,14 @@ router.get("/condition/list/?", middleware, async (req, res, next) => {
   return res.json(getCourseGroup);
 });
 
+router.get("/coursetotalquest", middleware, async (req, res, next) => {
+  const getCourseGroup = await runQuery(
+    `select course_code,SUM(cg_amount_random) AS total_quest from app_course A LEFT JOIN app_course_cluster B ON A.course_id = B.course_id
+WHERE A.active = '1'
+ GROUP BY course_code;`,
+   
+  );
+  return res.json(getCourseGroup);
+});
+
 module.exports = router;
