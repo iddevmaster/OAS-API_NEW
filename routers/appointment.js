@@ -602,20 +602,17 @@ router.post("/cancelapp", middleware, async (req, res, next) => {
   router.post("/veri", middleware, async (req, res, next) => {
     const data = req.body;
   
-    // con.query(
-    //   "UPDATE app_appointment_reserve SET app_status=?,remark=? WHERE ap_number=?",
-    //   [
-    //     "C",
-    //     data.remark,
-    //     data.ap_number
-    //   ],
-    //   function (err, result) {
-    //     if (err) throw err;
-    //     return res.json(result);
-    //   }
-    // );
-    const response = data;
-    return res.json(response);
+    con.query(
+      "UPDATE app_appointment_reserve SET remark_verify=? WHERE ap_number=?",
+      [
+        data.remarkcheck,
+        data.ap_number
+      ],
+      function (err, result) {
+        if (err) throw err;
+        return res.json(result);
+      }
+    );
     });
 
 ////////////ค้นหาหมายเลขนัดหมาย
