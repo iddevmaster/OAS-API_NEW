@@ -598,6 +598,25 @@ router.post("/cancelapp", middleware, async (req, res, next) => {
   );
 
   });
+////////////ยืนยันเอกสาร
+  router.post("/veri", middleware, async (req, res, next) => {
+    const data = req.body;
+  
+    // con.query(
+    //   "UPDATE app_appointment_reserve SET app_status=?,remark=? WHERE ap_number=?",
+    //   [
+    //     "C",
+    //     data.remark,
+    //     data.ap_number
+    //   ],
+    //   function (err, result) {
+    //     if (err) throw err;
+    //     return res.json(result);
+    //   }
+    // );
+    const response = data;
+    return res.json(response);
+    });
 
 ////////////ค้นหาหมายเลขนัดหมาย
 router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => {

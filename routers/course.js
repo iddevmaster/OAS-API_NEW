@@ -1498,4 +1498,7 @@ WHERE A.active = '1'
   return res.json(getCourseGroup);
 });
 
+
+
+
 module.exports = router;
