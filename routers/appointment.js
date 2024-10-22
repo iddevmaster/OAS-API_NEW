@@ -642,12 +642,10 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
       //   "SELECT COUNT(*) as numRows from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
       //   [data.ap_id]
       // );
-obj = {a:'new'}
-      return res.json(obj);
+      res.json('new');
     }
     if(stat == 'same'){
-      obj = {a:'sane'}
-      return res.json(obj);
+      res.json('same');
     }
 
 
