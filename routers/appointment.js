@@ -637,7 +637,7 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
       [data.ap_id]
     );
     const response = getContent;
-    return res.json(response);
+    return res.json(getContent);
   
     });
 
