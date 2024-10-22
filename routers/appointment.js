@@ -365,13 +365,14 @@ router.post("/reserve/new/create", middleware, async (req, res, next) => {
   const data = req.body;
   const user_id = data.user_id;
   const ap_id = data.ap_id;
+  const id_card = data.id_card;
 const a = [];
 const test = functions.DigitRandom();
 
 
 let _content = await runQuery(
-  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status) VALUES (?,?,?,?,?)",
-  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y']
+  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
+  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
 );
 
 
