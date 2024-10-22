@@ -633,16 +633,25 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
   router.post("/dateappointment/divso", middleware, async (req, res, next) => {
     const data = req.body;
     const ap_id = req.ap_id;
-
+    const stat = req.stat;
     
     
-    let getContent = await runQuery(
-      "SELECT COUNT(*) as numRows from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
-      [data.ap_id]
-    );
+  
+    if(stat == 'new'){
+      // let getContent = await runQuery(
+      //   "SELECT COUNT(*) as numRows from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
+      //   [data.ap_id]
+      // );
+obj = {a:'new'}
+      return res.json(obj);
+    }
+    if(stat == 'same'){
+      obj = {a:'sane'}
+      return res.json(obj);
+    }
 
 
-    return res.json(data);
+  //  return res.json(data);
     // return res.json(getContent[0]?.numRows);
   
     });
