@@ -633,6 +633,8 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
   router.post("/dateappointment/divso", middleware, async (req, res, next) => {
     const data = req.body;
     const ap_id = req.ap_id;
+
+    
     
     let getContent = await runQuery(
       "SELECT COUNT(*) as numRows from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
@@ -640,7 +642,8 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
     );
 
 
-    return res.json(getContent[0]?.numRows + 1);
+    return res.json(data);
+    // return res.json(getContent[0]?.numRows);
   
     });
 
