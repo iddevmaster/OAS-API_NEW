@@ -638,7 +638,7 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
     );
 
 
-    return res.json(getContent[0]?.numRows);
+    return res.json(getContent[0]?.numRows + 1);
   
     });
 
