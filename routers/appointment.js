@@ -601,9 +601,11 @@ router.post("/cancelapp", middleware, async (req, res, next) => {
     const data = req.body;
   
     con.query(
-      "UPDATE app_appointment_reserve SET remark_verify=? WHERE ap_number=?",
+      "UPDATE app_appointment_reserve SET remark_verify=?,st_id=?,check_document=? WHERE ap_number=?",
       [
         data.remarkcheck,
+        data.division,
+       'pass',
         data.ap_number
       ],
       function (err, result) {
