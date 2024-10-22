@@ -562,13 +562,9 @@ router.get("/reserve/list?", middleware, (req, res, next) => {
 
 router.post("/dateappointment", middleware, async (req, res, next) => {
 
-obj = [];
 
-const now = new Date();
-const day = now.getDate();           // วันที่
-const month = now.getMonth() + 1;    // เดือน (ต้อง +1 เพราะ getMonth() คืนค่าเป็น 0-11)
-const year = now.getFullYear();      // ปี
-let a = `${year}-${month}-${day}`
+
+  const data = req.body;
 
 let sql = `SELECT A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
