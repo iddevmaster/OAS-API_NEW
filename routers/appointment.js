@@ -633,7 +633,7 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
   router.post("/dateappointment/divso", middleware, async (req, res, next) => {
     const data = req.body;
     const ap_id = req.ap_id;
-    let stat = req.stat;
+    const stat = req.stat;
     
     
   
