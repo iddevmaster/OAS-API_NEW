@@ -631,12 +631,15 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
   router.post("/dateappointment/divso", middleware, async (req, res, next) => {
     const data = req.body;
     const ap_id = req.ap_id;
+    
+    let getContent = await runQuery(
+      "SELECT COUNT(*) as numRows from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
+      [data.ap_id]
+    );
+    const totalLesson =
+      lesson_content[0] !== undefined ? getContent[0]?.numRows : 0;
 
-    con.query('SELECT COUNT(*) as divso from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL', [ap_id], (err, results) => {
-
-    });
-
-    return res.json(results);
+    return res.json(totalLesson);
   
     });
 
