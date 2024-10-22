@@ -565,6 +565,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
 
 
   const data = req.body;
+  const ap_date_start = data.ap_date_start;
 
 let sql = `SELECT A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
@@ -572,7 +573,7 @@ LEFT JOIN app_user C ON C.user_id = A.user_id
 LEFT JOIN app_user_detail D ON C.user_id = D.user_id
 WHERE DATE(B.ap_date_first) = ?
 `;
-let getContent = await runQuery(sql,a);
+let getContent = await runQuery(sql,ap_date_start);
   return res.json(getContent);
 });
 
