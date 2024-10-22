@@ -634,10 +634,13 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
     
     let getContent = await runQuery(
       "SELECT COUNT(*) as divso from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
-      [data.ap_id]
     );
-    const response = getContent;
-    return res.json(getContent);
+
+    con.query(getContent, [ap_id], (err, results) => {
+
+    });
+
+    return res.json(results);
   
     });
 
