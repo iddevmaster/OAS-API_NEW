@@ -615,25 +615,31 @@ router.post("/cancelapp", middleware, async (req, res, next) => {
 
 ////////////ค้นหาหมายเลขนัดหมาย
 router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => {
-
   const data = req.body;
   const ap_number = req.ap_number;
   
-  // let sql = `SELECT * from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id  
-  // LEFT JOIN app_user C ON A.user_id = C.user_id WHERE DATE(B.ap_date_first) = '2024-10-07'`;
-  // let getContent = await runQuery(sql);
-
-
   let getContent = await runQuery(
     "SELECT * from app_appointment_reserve A LEFT JOIN app_user B ON A.user_id = B.user_id LEFT JOIN app_appointment C ON C.ap_id = A.ap_id LEFT JOIN app_user_detail D ON D.user_id = A.user_id LEFT JOIN app_zipcode_lao E ON D.location_id = E.id LEFT JOIN app_country F ON D.country_id = F.country_id WHERE A.ap_number =? LIMIT 1",
     [data.ap_number]
   );
-
-
   const response = getContent;
   return res.json(response);
 
   });
+
+
+  router.post("/dateappointment/divso", middleware, async (req, res, next) => {
+    const data = req.body;
+    const ap_id = req.ap_id;
+    
+    let getContent = await runQuery(
+      "SELECT COUNT(*) as divso from app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.ap_id =? AND A.st_id IS NOT NULL",
+      [data.ap_id]
+    );
+    const response = getContent;
+    return res.json(response);
+  
+    });
 
 //
 
