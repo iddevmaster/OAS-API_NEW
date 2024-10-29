@@ -609,7 +609,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
 
 
 
-  return res.json(getContentpr[0].province_code);
+  return res.json(parseInt(getContentpr[0].province_code));
 
   }
 
