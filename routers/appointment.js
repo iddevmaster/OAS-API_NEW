@@ -583,7 +583,7 @@ LEFT JOIN app_user_detail D ON C.user_id = D.user_id
 WHERE DATE(B.ap_date_first) = ?
 `;
 let getContent = await runQuery(sql,ap_date_start);
-  return res.json(data);
+  return res.json(getContent);
 
   }
 
