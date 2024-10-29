@@ -586,7 +586,7 @@ let getContent = await runQuery(sql,[ap_date_start,location]);
 
 
 
-  return res.json(data);
+  return res.json(getContent);
 
   }
 
