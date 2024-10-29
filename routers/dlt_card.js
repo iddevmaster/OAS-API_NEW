@@ -314,7 +314,7 @@ router.post("/old", middleware, async (req, res, next) => {
 
 
   con.query(
-    "UPDATE  app_dlt_card SET status = ? WHERE id=?",
+    "UPDATE  app_dlt_card SET status = ? WHERE user_id=?",
     [
       "D",
       data.user_id,
