@@ -606,11 +606,7 @@ LEFT JOIN app_zipcode_lao E ON E.id = D.location_id
 WHERE DATE(B.ap_date_first) = ? AND E.province_code = ?
 `;
 let getContent = await runQuery(sql,[ap_date_start,getContentpr[0].province_code]);
-
-
-
   return res.json(getContent);
-
   }
 
 
