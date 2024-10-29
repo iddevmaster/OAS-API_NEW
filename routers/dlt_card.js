@@ -225,7 +225,79 @@ router.get("/check/expiry_date", middleware, (req, res, next) => {
 router.post("/create/news", middleware, async (req, res, next) => {
   const data = req.body;
 
-  return res.json(data);
+
+  const dlt_code = data.dlt_code;
+  const obj = common.drivinglicense_type;
+
+  const id = functions.randomCode();
+  const getUser = await runQuery(
+    "SELECT user_id FROM app_user WHERE user_id = ?",
+    [data.user_id]
+  );
+  const getUserCreate = await runQuery(
+    "SELECT user_id FROM app_user WHERE user_id = ?",
+    [data.user_create]
+  );
+  const user_id = getUser[0] !== undefined ? getUser[0]?.user_id : 0;
+  const user_create =
+    getUserCreate[0] !== undefined ? getUserCreate[0]?.user_id : 0;
+  if (user_id === 0) {
+    return res.status(404).json({
+      status: 404,
+      message: "Username Error",
+    });
+  }
+  let objValue = [];
+  for (let i = 0; i < dlt_code.length; i++) {
+    const el = dlt_code[i];
+    const result_filter = obj.filter(function (e) {
+      return e.dlt_code === el;
+    });
+    if (result_filter.length <= 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "Invalid 'dlt_code' ",
+      });
+    }
+    let newObj = [`${el}`, `${id}`];
+    objValue.push(newObj);
+  }
+
+  const date = new Date(functions.dateAsiaThai());
+  const dateStr = date.toISOString().split("T")[0];
+  const getAllCard = await runQuery(
+    "SELECT COUNT(*) as numRows FROM app_dlt_card WHERE DATE(crt_date) = ?",
+    [dateStr]
+  );
+  const total = getAllCard[0] !== undefined ? getAllCard[0]?.numRows : 1;
+  const card_number =
+    functions.yyyymmdd(dateStr) + functions.treeDigit(total + 1);
+  // dlt_type
+  let sql = " INSERT INTO app_dlt_card_type (dlt_code,dlt_card_id) VALUES ? ";
+  await runQuery(sql, [objValue]);
+  con.query(
+    "INSERT INTO app_dlt_card (id,card_number,full_name,address,front_img,back_img,issue_date,expiry_date,crt_date,udp_date,user_id,user_create) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+    [
+      id,
+      card_number,
+      "-",
+      "-",
+      data.image_dlt,
+      "-",
+      data.issue_date,
+      data.expiry_date,
+      functions.dateAsiaThai(),
+      functions.dateAsiaThai(),
+      user_id,
+      user_create,
+    ],
+    function (err, result) {
+      if (err) throw err;
+      result.insertId = id;
+      return res.json(result);
+    }
+  );
+ 
 
 });
 
