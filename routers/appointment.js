@@ -576,7 +576,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
       let sql = `select * from app_zipcode_lao where id = ? `;
 
   let getContent = await runQuery(sql,[location]);
-  return res.json(getContent.province_code);
+  return res.json(getContent['province_code']);
 //   if(user_type == 1){
 
 
