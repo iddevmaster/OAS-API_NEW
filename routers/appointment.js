@@ -572,8 +572,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
   const user_type = data.user_type;
 
   let checkIden = await runQuery(
-    "select * from app_zipcode_lao where id = ?",
-    [data.location]
+    "select * from app_zipcode_lao where id = 104",
   );
 
   return res.json(checkIden);
