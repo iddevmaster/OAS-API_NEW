@@ -276,7 +276,7 @@ router.post("/create/news", middleware, async (req, res, next) => {
   let sql = " INSERT INTO app_dlt_card_type (dlt_code,dlt_card_id) VALUES ? ";
   await runQuery(sql, [objValue]);
   con.query(
-    "INSERT INTO app_dlt_card (id,card_number,full_name,address,front_img,back_img,issue_date,expiry_date,crt_date,udp_date,user_id,user_create) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+    "INSERT INTO app_dlt_card (id,card_number,full_name,address,front_img,back_img,issue_date,expiry_date,crt_date,udp_date,user_id,user_create,address_lic,ap_number,type,number_licen) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
     [
       id,
       card_number,
@@ -290,6 +290,10 @@ router.post("/create/news", middleware, async (req, res, next) => {
       functions.dateAsiaThai(),
       user_id,
       user_create,
+      data.address_lic,
+      data.ap_number,
+      data.type,
+      data.number_licen,
     ],
     function (err, result) {
       if (err) throw err;
