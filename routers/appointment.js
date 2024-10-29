@@ -580,7 +580,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
 LEFT JOIN app_user_detail D ON C.user_id = D.user_id
-WHERE DATE(B.ap_date_first) = ? AND AND D.location_id = ?
+WHERE DATE(B.ap_date_first) = ? AND D.location_id = ?
 `;
 let getContent = await runQuery(sql,ap_date_start,location);
   return res.json(getContent);
