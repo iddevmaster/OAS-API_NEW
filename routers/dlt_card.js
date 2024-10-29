@@ -168,7 +168,7 @@ router.get("/list?", middleware,async (req, res, next) => {
   //   console.log(user_id);
   const date = new Date(functions.dateAsiaThai());
   const dateStr = date.toISOString().split("T")[0];
-  console.log(dateStr);
+
   
   const getDltCardAll = await runQuery(
     "SELECT app_dlt_card.*,CONCAT(app_user.user_firstname ,' ' , app_user.user_lastname) AS fullname_create FROM  app_dlt_card INNER JOIN app_user ON app_user.user_id = app_dlt_card.user_id WHERE  app_dlt_card.user_id = ?  AND DATE(app_dlt_card.expiry_date) > ? ORDER BY app_dlt_card.id DESC",
@@ -303,6 +303,28 @@ router.post("/create/news", middleware, async (req, res, next) => {
     }
   );
  
+
+});
+
+
+
+
+router.post("/dlt/old", middleware, async (req, res, next) => {
+  const data = req.body;
+
+
+  con.query(
+    "UPDATE  app_dlt_card SET status = ? WHERE id=?",
+    [
+      "D",
+      data.user_id,
+    ],
+    function (err, result) {
+      if (err) throw err;
+      return res.json(result);
+    }
+  );
+
 
 });
 
