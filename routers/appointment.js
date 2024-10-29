@@ -571,36 +571,42 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
   const location = data.location_id;
   const user_type = data.user_type;
 
-  if(user_type == 1){
+  let checkIden = await runQuery(
+    "select * from app_zipcode_lao where id = ?",
+    [data.location]
+  );
+
+  return res.json(checkIden);
+//   if(user_type == 1){
 
 
-    let sql = `SELECT D.*,A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
-    LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
-    LEFT JOIN app_user C ON C.user_id = A.user_id
-    LEFT JOIN app_user_detail D ON C.user_id = D.user_id
-    WHERE DATE(B.ap_date_first) = ?
-    `;
-    let getContent = await runQuery(sql,[ap_date_start]);
+//     let sql = `SELECT D.*,A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
+//     LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
+//     LEFT JOIN app_user C ON C.user_id = A.user_id
+//     LEFT JOIN app_user_detail D ON C.user_id = D.user_id
+//     WHERE DATE(B.ap_date_first) = ?
+//     `;
+//     let getContent = await runQuery(sql,[ap_date_start]);
 
-      return res.json(getContent);
+//       return res.json(getContent);
     
 
-  }
+//   }
 
-  if(user_type == 2){
-    let sql = `SELECT D.*,A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
-LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
-LEFT JOIN app_user C ON C.user_id = A.user_id
-LEFT JOIN app_user_detail D ON C.user_id = D.user_id
-WHERE DATE(B.ap_date_first) = ? AND D.location_id = ?
-`;
-let getContent = await runQuery(sql,[ap_date_start,location]);
+//   if(user_type == 2){
+//     let sql = `SELECT D.*,A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
+// LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
+// LEFT JOIN app_user C ON C.user_id = A.user_id
+// LEFT JOIN app_user_detail D ON C.user_id = D.user_id
+// WHERE DATE(B.ap_date_first) = ? AND D.location_id = ?
+// `;
+// let getContent = await runQuery(sql,[ap_date_start,location]);
 
 
 
-  return res.json(getContent);
+//   return res.json(getContent);
 
-  }
+//   }
 
 
 });
