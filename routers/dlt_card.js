@@ -220,4 +220,14 @@ router.get("/check/expiry_date", middleware, (req, res, next) => {
   );
 });
 
+
+
+router.post("/create/news", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  return res.json(data);
+
+});
+
+
 module.exports = router;
