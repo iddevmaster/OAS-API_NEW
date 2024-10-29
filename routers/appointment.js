@@ -568,7 +568,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
   const data = req.body;
   const ap_date_start = data.ap_date_start;
   const user_id = data.user_id;
-  const location = data.location;
+  const location = data.location_id;
   const user_type = data.user_type;
 
   if(user_type == 1){
@@ -583,7 +583,7 @@ LEFT JOIN app_user_detail D ON C.user_id = D.user_id
 WHERE DATE(B.ap_date_first) = ? AND D.location_id = ?
 `;
 let getContent = await runQuery(sql,ap_date_start,location);
-  return res.json(getContent);
+  return res.json(data);
 
   }
 
