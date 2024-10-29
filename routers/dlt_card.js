@@ -309,7 +309,7 @@ router.post("/create/news", middleware, async (req, res, next) => {
 
 
 
-router.post("/dlt/old", middleware, async (req, res, next) => {
+router.post("/dlt_card/old", middleware, async (req, res, next) => {
   const data = req.body;
 
 
