@@ -329,4 +329,40 @@ router.post("/old", middleware, async (req, res, next) => {
 });
 
 
+router.get("/lastes/list?", middleware,async (req, res, next) => {
+  const user_id = req.query.user_id;
+
+
+  
+  const getDltCardAll = await runQuery(
+    "SELECT * FROM  app_dlt_card where status = 'Y' AND user_id = ? LIMIT 1",
+    [user_id]
+  );
+  let obj = [];
+  for (let i = 0; i < getDltCardAll.length; i++) {
+    const el = getDltCardAll[i];
+    const dlttypes = await runQuery(
+      "SELECT * FROM `app_dlt_card_type` WHERE dlt_card_id = ?",
+      [el?.id]
+    );
+    const newObj = {
+      id: el?.id,
+      address_lic: el?.address_lic,
+      ap_number: el?.ap_number,
+      type: el?.type,
+      number_licen: el?.number_licen,
+      front_img: el?.front_img,
+      issue_date: el?.issue_date,
+      expiry_date: el?.expiry_date,
+      crt_date: el?.crt_date,
+      udp_date: el?.udp_date,
+      user_create: el?.fullname_create,
+      dlt_types: dlttypes,
+    };
+    obj.push(newObj);
+  }
+  return res.json(obj)
+});
+
+
 module.exports = router;
