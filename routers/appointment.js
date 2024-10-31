@@ -293,21 +293,21 @@ router.get("/event/new", middleware, (req, res, next) => {
   const last_day = new Date();
   const last_dayt = last_day.setDate(last_day.getDate() + 14).toISOString().split("T")[0];
   
-
-  con.query(
-    "SELECT * FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND ap_date_first >= ? and ap_date_first <= ? ORDER BY ap_date_first asc",
-    [ap_learn_type, dlt_code, present_day,last_day],
-    (err, result) => {
-      if (err) {
-        return res.status(400).json({
-          status: 400,
-          message: "Bad Request", // error.sqlMessage
-        });
-      }
-      // console.log(result);
-      return res.json(last_dayt);
-    }
-  );
+  return res.json(last_dayt);
+  // con.query(
+  //   "SELECT * FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND ap_date_first >= ? and ap_date_first <= ? ORDER BY ap_date_first asc",
+  //   [ap_learn_type, dlt_code, present_day,last_day],
+  //   (err, result) => {
+  //     if (err) {
+  //       return res.status(400).json({
+  //         status: 400,
+  //         message: "Bad Request", // error.sqlMessage
+  //       });
+  //     }
+  //     // console.log(result);
+  //     return res.json(last_dayt);
+  //   }
+  // );
 });
 
 router.post("/reserve/create", middleware, async (req, res, next) => {
