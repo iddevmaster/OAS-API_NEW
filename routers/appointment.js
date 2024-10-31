@@ -290,7 +290,9 @@ router.get("/event/new", middleware, (req, res, next) => {
   let ap_learn_type = req.query.ap_learn_type;
   let dlt_code = req.query.dlt_code;
   const present_day = new Date().toISOString().split("T")[0];
-  const last_day = new Date().toISOString().split("T")[0];
+  const last_day = new Date();
+  const last_dayt = last_day.setDate(last_day.getDate() + 14).toISOString().split("T")[0];
+  
 
   con.query(
     "SELECT * FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND ap_date_first >= ? and ap_date_first <= ? ORDER BY ap_date_first asc",
@@ -303,7 +305,7 @@ router.get("/event/new", middleware, (req, res, next) => {
         });
       }
       // console.log(result);
-      return res.json(last_day);
+      return res.json(last_dayt);
     }
   );
 });
