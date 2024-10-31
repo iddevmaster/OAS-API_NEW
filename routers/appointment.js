@@ -290,11 +290,11 @@ router.get("/event/new", middleware, (req, res, next) => {
   let ap_learn_type = req.query.ap_learn_type;
   let dlt_code = req.query.dlt_code;
   const present_day = new Date().toISOString().split("T")[0];
-
+  const last_day = new Date().toISOString().split("T")[0];
 
   con.query(
-    "SELECT  DATE_FORMAT(ap_date_start,'%Y-%m-%d') AS event   FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND DATE(ap_date_start) > ? GROUP BY event ORDER BY event ASC LIMIT 0,30",
-    [ap_learn_type, dlt_code, present_day],
+    "SELECT * FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND ap_date_first >= ? and ap_date_first <= ? ORDER BY ap_date_first asc",
+    [ap_learn_type, dlt_code, present_day,last_day],
     (err, result) => {
       if (err) {
         return res.status(400).json({
@@ -303,7 +303,7 @@ router.get("/event/new", middleware, (req, res, next) => {
         });
       }
       // console.log(result);
-      return res.json(result);
+      return res.json(last_day);
     }
   );
 });
