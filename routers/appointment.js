@@ -291,7 +291,7 @@ router.get("/event/new", middleware, (req, res, next) => {
   let dlt_code = req.query.dlt_code;
   const present_day = new Date().toISOString().split("T")[0];
  
-  const last_day = new Date(Date.now()+14*24*60*60*1000);
+  const last_day = new Date(Date.now()+14*24*60*60*1000).toISOString().split("T")[0];;
   // const last_dayt = last_day.setDate(last_day.getDate() + 14).toLocaleDateString();
   
   return res.json(last_day);
