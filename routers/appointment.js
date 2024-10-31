@@ -296,7 +296,7 @@ router.get("/event/new", middleware, (req, res, next) => {
   
 
   con.query(
-    "SELECT * FROM app_appointment WHERE ap_learn_type  = ? AND dlt_code = ? AND ap_date_first >= ? and ap_date_first <= ? ORDER BY ap_date_first asc",
+    "SELECT A.*,COUNT(B.ap_id) as available FROM app_appointment A LEFT JOIN app_appointment_reserve B ON A.ap_id = B.ap_id WHERE A.ap_learn_type  = ? AND A.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? GROUP BY A.ap_id ORDER BY A.ap_date_first asc",
     [ap_learn_type, dlt_code, present_day,last_day],
     (err, result) => {
       if (err) {
