@@ -303,7 +303,7 @@ router.get("/event/new", middleware, (req, res, next) => {
         });
       }
       // console.log(result);
-      return res.json(present_day);
+      return res.json(result);
     }
   );
 });
