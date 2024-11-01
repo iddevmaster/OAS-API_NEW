@@ -30,7 +30,7 @@ router.post("/list?", middleware, async (req, res, next) => {
 
 ////////////////////check user type
   let _check_user = await runQuery(
-    "SELECT A.user_id,A.user_type,B.location_id FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE A.user_id = ?",
+    "SELECT A.user_id,A.user_type,B.location_id,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE A.user_id = ?",
     [data.user_id]
   );
 
@@ -108,11 +108,11 @@ if(data.verify_account == 'system_unactive'){
   }else if(_check_user[0].user_type == '2') {
   
     let sql =
-    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date,A.user_full_name  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE cancelled=1 AND A.user_type =3";
+    "SELECT 	A.user_id,  A.user_name,  A.user_firstname,  A.user_lastname, A.user_email, A.user_phone, A.user_type, B.verify_account,B.identification_number,A.login_last_date,A.user_full_name,C.*  FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE cancelled=1 AND A.user_type =3";
 
-  if (_check_user[0].location_id) {
-    let user_type = _check_user[0].location_id;
-    u = " AND B.location_id =  " + user_type; // ประเภท User
+  if (_check_user[0].province_code) {
+    let user_type = _check_user[0].province_code;
+    u = " AND C.province_code =  " + user_type; // ประเภท User
     sql += u;
   }
 
