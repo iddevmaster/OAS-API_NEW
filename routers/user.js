@@ -140,7 +140,7 @@ if(data.verify_account == 'system_unactive'){
   }
 
   let sql_count =
-    " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id WHERE  cancelled=1  AND A.user_type =3";
+    " SELECT  COUNT(*) as numRows FROM  app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE  cancelled=1  AND A.user_type =3";
   let getCountAll = await runQuery(sql_count + u + c);
   total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
 
