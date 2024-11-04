@@ -469,10 +469,17 @@ if (_check_reserve == 0) {
         "FULL",
     });
   }else {
+
+    let _content = await runQuery(
+  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
+  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
+);
+
+
     return res.status(200).json({
       status: 200,
       message:
-        "OK",
+      _content,
     });
   }
 
@@ -488,16 +495,11 @@ if (_check_reserve == 0) {
 
 
 
-// let _content = await runQuery(
-//   "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
-//   [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
-// );
-
-// const present_day = new Date().toISOString().split("T")[0];
 
 
 
-return res.json(checkdup);
+
+
 });
 
 router.delete("/reserve/delete/:ar_id", middleware, (req, res, next) => {
