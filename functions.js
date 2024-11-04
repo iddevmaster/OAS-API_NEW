@@ -88,13 +88,13 @@ return result+result2;
 };
 
 
-f.Arrayall = (item) => {
+f.Arrayall = (item,data) => {
 
  const resvr = [];
 for (let i = 0; i < item.length; i++) {
   resvr.push(item[i].dlt_code);
 }
-
+resvr.push(data[0].dlt_code);
 return resvr
 
 }

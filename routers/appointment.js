@@ -411,8 +411,11 @@ let getMyInReserve = await runQuery(
 _check_reserve = getMyReserve.length;
 if (_check_reserve >= 1) {
   _check_reserveIn = getMyInReserve;
+
   const datainarray = await functions.Arrayall(getMyReserve,_check_reserveIn);
 const checkdup = await functions.Checkdupi(datainarray);
+
+
 ////////////////////กรณี ซ้ำ
 if(checkdup == true){
   return res.status(201).json({
