@@ -439,11 +439,20 @@ if(checkdup == false){
         "FULL",
     });
   }else {
-    return res.status(200).json({
-      status: 200,
-      message:
-        "OK",
-    });
+
+    let _content = await runQuery(
+      "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
+      [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
+    );
+    
+    
+        return res.status(200).json({
+          status: 200,
+          message:
+          _content,
+        });
+
+
 
   }
 }
