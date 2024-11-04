@@ -87,4 +87,22 @@ while (counter2 < 2) {
 return result+result2;
 };
 
+
+f.Arrayall = (item) => {
+
+ const resvr = [];
+for (let i = 0; i < item.length; i++) {
+  resvr.push(item[i].dlt_code);
+}
+
+return resvr
+
+}
+f.Checkdupi = (data) => {
+
+
+ const a = data.some((item, index) => data.indexOf(item) !== index);
+  return a
+}
+
 module.exports = f;

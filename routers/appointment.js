@@ -390,19 +390,114 @@ router.post("/reserve/new/create", middleware, async (req, res, next) => {
   const data = req.body;
   const user_id = data.user_id;
   const ap_id = data.ap_id;
+  const ap_date_first = data.ap_date_first;
   const id_card = data.id_card;
 const a = [];
 const test = functions.DigitRandom();
 
 
-let _content = await runQuery(
-  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
-  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
+///////////////อันที่จองไว้แล้ว
+let getMyReserve = await runQuery(
+  "SELECT A.*,B.dlt_code,B.ap_date_first FROM app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.app_status = 'Y' AND A.user_id = ? AND B.ap_date_first = ?",
+  [user_id,ap_date_first]
 );
 
+///////////////อันที่กำลังจะจอง
+let getMyInReserve = await runQuery(
+  "SELECT * FROM app_appointment where ap_id = ?",
+  [ap_id]
+);
+
+_check_reserve = getMyReserve.length;
+if (_check_reserve >= 1) {
+  _check_reserveIn = getMyInReserve;
+  const datainarray = await functions.Arrayall(getMyReserve,_check_reserveIn);
+const checkdup = await functions.Checkdupi(datainarray);
+////////////////////กรณี ซ้ำ
+if(checkdup == true){
+  return res.status(201).json({
+    status: 201,
+    message:
+      "You have entered an ap_id and user_id that already exists in this column. Only unique ap_id and user_id are allowed.",
+  });
+}
+////////////////////กรณี ไม่ซ้ำ
+if(checkdup == false){
+  const quota = _check_reserveIn[0].ap_quota
+
+  let getquota = await runQuery(
+    "SELECT COUNT(*) as total FROM app_appointment_reserve where ap_id = ? AND app_status = 'Y' limit 1",
+    [ap_id]
+  );
+  if(getquota[0].total >= quota){
+    return res.status(202).json({
+      status: 202,
+      message:
+        "FULL",
+    });
+  }else {
+    return res.status(200).json({
+      status: 200,
+      message:
+        "OK",
+    });
+
+  }
+}
+
+}
 
 
-return res.json(_content);
+if (_check_reserve == 0) {
+ 
+
+
+  let getMyInReserve = await runQuery(
+    "SELECT * FROM app_appointment where ap_id = ?",
+    [ap_id]
+  );
+  const quota = getMyInReserve[0].ap_quota
+
+  let getquota = await runQuery(
+    "SELECT COUNT(*) as total FROM app_appointment_reserve where ap_id = ? AND app_status = 'Y' limit 1",
+    [ap_id]
+  );
+  if(getquota[0].total >= quota){
+    return res.status(202).json({
+      status: 202,
+      message:
+        "FULL",
+    });
+  }else {
+    return res.status(200).json({
+      status: 200,
+      message:
+        "OK",
+    });
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+// let _content = await runQuery(
+//   "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
+//   [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
+// );
+
+// const present_day = new Date().toISOString().split("T")[0];
+
+
+
+return res.json(checkdup);
 });
 
 router.delete("/reserve/delete/:ar_id", middleware, (req, res, next) => {
