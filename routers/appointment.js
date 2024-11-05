@@ -545,7 +545,7 @@ router.delete("/reserve/delete/:ar_id", middleware, (req, res, next) => {
 router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
   const { user_id } = req.params;
   let sql = `
-  SELECT t1.*, t2.ap_date_first,t2.dlt_code,
+  SELECT t1.*, t2.ap_date_first,t2.dlt_code,t2.type,
   (SELECT   GROUP_CONCAT((JSON_OBJECT('ap_id', t5.ap_id,'ap_learn_type', t5.ap_learn_type,'ap_quota', t5.ap_quota , 'ap_date_start', t5.ap_date_start,'ap_date_end', t5.ap_date_end,'ap_remark', t5.ap_remark,'dlt_code', t5.dlt_code)))  FROM app_appointment t5  WHERE t5.ap_id =  t1.ap_id ) AS appointment_detail
   FROM app_appointment_reserve t1  INNER JOIN app_appointment t2 ON t2.ap_id = t1.ap_id AND t2.cancelled=1 WHERE t1.user_id = ?`;
   con.query(sql, [user_id], function (err, result) {
@@ -558,6 +558,7 @@ router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
         ap_id: el?.ap_id,
         ap_date_first: el?.ap_date_first,
         dlt_code: el?.dlt_code,
+        type: el?.type,
         user_id: el?.user_id,
         udp_date: el?.udp_date,
         appointment_detail: appointment_detail,
