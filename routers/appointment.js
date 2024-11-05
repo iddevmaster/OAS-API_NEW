@@ -561,6 +561,7 @@ router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
         type: el?.type,
         user_id: el?.user_id,
         udp_date: el?.udp_date,
+        ap_number: el?.ap_number,
         appointment_detail: appointment_detail,
       };
       obj.push(newObj);
