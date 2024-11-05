@@ -556,6 +556,8 @@ router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
       let newObj = {
         ar_id: el?.ar_id,
         ap_id: el?.ap_id,
+        ap_date_first: el?.ap_date_first,
+        dlt_code: el?.dlt_code,
         user_id: el?.user_id,
         udp_date: el?.udp_date,
         appointment_detail: appointment_detail,
