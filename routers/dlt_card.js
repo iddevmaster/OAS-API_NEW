@@ -366,7 +366,7 @@ router.get("/listall?", middleware,async (req, res, next) => {
   const user_id = req.query.user_id;
 
   const getDltCardAll = await runQuery(
-    "SELECT A.*,B.user_full_name,B.user_firstname,B.user_firstname FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id WHERE A.user_id = ? ORDER BY A.crt_date DESC",
+    "SELECT A.*,B.user_full_name,B.user_firstname,B.user_firstname FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id WHERE A.user_id = ? ORDER BY A.crt_date ASC",
     [user_id]
   );
 
