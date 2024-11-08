@@ -366,12 +366,13 @@ router.get("/listall?", middleware,async (req, res, next) => {
   const user_id = req.query.user_id;
 
   const getDltCardAll = await runQuery(
-    "SELECT A.*,B.user_full_name,B.user_firstname,B.user_firstname FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id WHERE A.user_id = ? ORDER BY A.crt_date ASC",
+    "SELECT A.id,GROUP_CONCAT(C.dlt_code ORDER BY C.dlt_code SEPARATOR '/') AS dlt,A.* FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id  LEFT JOIN app_dlt_card_type C ON A.id = C.dlt_card_id WHERE A.user_id = ? GROUP BY A.id ORDER BY A.crt_date ASC",
     [user_id]
   );
 
   return res.json(getDltCardAll)
 });
+
 
 
 module.exports = router;
