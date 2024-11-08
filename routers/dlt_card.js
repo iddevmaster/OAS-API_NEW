@@ -332,8 +332,6 @@ router.post("/old", middleware, async (req, res, next) => {
 router.get("/lastes/list?", middleware,async (req, res, next) => {
   const user_id = req.query.user_id;
 
-
-  
   const getDltCardAll = await runQuery(
     "SELECT * FROM  app_dlt_card where status = 'Y' AND user_id = ? LIMIT 1",
     [user_id]
@@ -362,6 +360,17 @@ router.get("/lastes/list?", middleware,async (req, res, next) => {
     obj.push(newObj);
   }
   return res.json(obj)
+});
+
+router.get("/listall?", middleware,async (req, res, next) => {
+  const user_id = req.query.user_id;
+
+  const getDltCardAll = await runQuery(
+    "SELECT A.*,B.user_full_name,B.user_firstname,B.user_firstname FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id WHERE A.user_id = ? ORDER BY A.crt_date DESC",
+    [user_id]
+  );
+
+  return res.json(getDltCardAll)
 });
 
 

@@ -440,6 +440,8 @@ router.post("/list/get/driv", middleware, async (req, res, next) => {
   }
  
   let datastype = check_user[0].user_type;
+
+  
   if(datastype == 1){  /////////////////////////////  เช็ค Admin ว่าเป็นระดับ 1
     let datauser = await runQuery(
       "SELECT A.*,B.*,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON C.id = B.location_id  WHERE A.user_id= ? AND B.status ='Y'",
