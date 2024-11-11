@@ -393,7 +393,7 @@ router.post("/listallway", middleware,async (req, res, next) => {
 
   if (search !== "" || search.length > 0) {
     // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
-    let q = ` AND (A.id  LIKE ? OR A.number_licen  LIKE  ?)`; //
+    let q = ` AND (A.id  LIKE ? OR A.number_licen  LIKE  ? OR A.address_lic  LIKE  ?)`; //
     sql += q;
     sql_count += q;
     search_param = [
