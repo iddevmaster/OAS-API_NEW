@@ -505,7 +505,7 @@ router.put("/updatenew/:id", middleware, async (req, res, next) => {
   let sql = " INSERT INTO app_dlt_card_type (dlt_code,dlt_card_id) VALUES ? ";
   await runQuery(sql, [objValue]);
   con.query(
-    "UPDATE  app_dlt_card SET number_licen = ? ,address_lic = ?, front_img=?,issue_date=? , expiry_date=? ,udp_date=? WHERE id=?",
+    "UPDATE  app_dlt_card SET number_licen = ? ,address_lic = ?, front_img=?,issue_date=? ,expiry_date=? ,type=? ,udp_date=? WHERE id=?",
     [
       data.number_licen,
       data.address_lic,
