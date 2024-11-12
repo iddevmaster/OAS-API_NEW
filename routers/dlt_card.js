@@ -463,4 +463,64 @@ sql += ` LIMIT ${offset},${per_page} `;
   return res.json(response);
 });
 
+
+
+router.put("/updatenew/:id", middleware, async (req, res, next) => {
+  const { id } = req.params;
+  const data = req.body;
+  const dlt_code = data.dlt_code;
+  const obj = common.drivinglicense_type;
+
+  const getDltCard = await runQuery(
+    "SELECT * FROM  app_dlt_card WHERE  id= ? ",
+    [id]
+  );
+  const card_number = getDltCard[0] !== undefined ? getDltCard[0]?.card_number : false;
+  if (card_number === false) {
+    return res.status(404).json({
+      status: 404,
+      message: "Data is null",
+    });
+  }
+
+  let objValue = [];
+  for (let i = 0; i < dlt_code.length; i++) {
+    const el = dlt_code[i];
+    const result_filter = obj.filter(function (e) {
+      return e.dlt_code === el;
+    });
+    if (result_filter.length <= 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "Invalid 'dlt_code' ",
+      });
+    }
+    let newObj = [`${el}`, `${id}`];
+    objValue.push(newObj);
+  }
+
+
+  await runQuery("DELETE FROM  app_dlt_card_type WHERE dlt_card_id=?", [id]);
+  // dlt_type
+  let sql = " INSERT INTO app_dlt_card_type (dlt_code,dlt_card_id) VALUES ? ";
+  await runQuery(sql, [objValue]);
+  con.query(
+    "UPDATE  app_dlt_card SET number_licen = ? ,address_lic = ?, front_img=?,issue_date=? , expiry_date=? ,udp_date=? WHERE id=?",
+    [
+      data.number_licen,
+      data.address_lic,
+      data.image_dlt,
+      data.issue_date,
+      data.expiry_date,
+      data.type,
+      functions.dateAsiaThai(),
+      id,
+    ],
+    function (err, result) {
+      if (err) throw err;
+      return res.json(result);
+    }
+  );
+});
+
 module.exports = router;
