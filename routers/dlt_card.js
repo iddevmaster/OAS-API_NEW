@@ -408,7 +408,7 @@ router.get("/listall?", middleware,async (req, res, next) => {
 });
 
 
-router.post("/listallway", middleware,async (req, res, next) => {
+router.post("/listoneway", middleware,async (req, res, next) => {
   const data = req.body;
 
   const current_page = data.page;
@@ -514,11 +514,69 @@ router.post("/listallway", middleware,async (req, res, next) => {
     return res.json(response);
     
   }
+});
 
 
 
+router.post("/listallway", middleware,async (req, res, next) => {
+  const data = req.body;
+
+  const current_page = data.page;
+  const per_page = data.per_page <= 50 ? data.per_page : 50;
+  const search = data.search;
+  const offset = functions.setZero((current_page - 1) * per_page);
+  
+
+  let search_param = [];
+  let u = "";
+  let c = "";
+
+
+  let sql = "SELECT A.id as ids,GROUP_CONCAT(C.dlt_code ORDER BY C.dlt_code SEPARATOR '/') AS dlt,A.*,(SELECT user_name from app_user where user_id = A.user_create) as full_name_create,D.location_id,D.country_id,E.* FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id LEFT JOIN app_dlt_card_type C ON A.id = C.dlt_card_id LEFT JOIN app_user_detail D ON A.user_id = D.user_id LEFT JOIN app_zipcode_lao E ON E.id = D.location_id  WHERE A.status = 'Y'";
+  let sql_count = `SELECT COUNT(*) as numRows FROM  app_dlt_card A WHERE A.status = 'Y'`;
+
+  if (search !== "" || search.length > 0) {
+    // sql += ` AND (user_name  LIKE  '%${search}%' OR user_firstname  LIKE  '%${search}%' OR user_lastname  LIKE  '%${search}%' OR user_email  LIKE  '%${search}%' OR user_phone  LIKE  '%${search}%')`; //
+    let q = ` AND (A.id  LIKE ? OR A.number_licen  LIKE  ? OR A.address_lic  LIKE  ?)`; //
+    sql += q;
+    sql_count += q;
+    search_param = [
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+      `%${search}%`,
+    ];
+  }
+
+ c = "GROUP BY A.id ORDER BY A.crt_date ASC"; 
+   sql += c;
+ 
+
+const getCountAll = await runQuery(sql_count,search_param);
+const total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
+const total_filter = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
+ 
+sql += ` LIMIT ${offset},${per_page} `;
+
+    let getContent = await runQuery(sql, search_param);
+    const response = {
+      total: total, // จำนวนรายการทั้งหมด
+      total_filter: total_filter, // จำนวนรายการทั้งหมด
+      current_page: current_page, // หน้าที่กำลังแสดงอยู่
+      limit_page: per_page, // limit data
+      total_page: Math.ceil(total_filter / per_page), // จำนวนหน้าทั้งหมด
+      search: search, // คำค้นหา
+      data: getContent, // รายการข้อมูล
+    };
+  return res.json(response);
 
 });
+
+
+
+
 
 
 
