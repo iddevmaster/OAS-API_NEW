@@ -523,4 +523,25 @@ router.put("/updatenew/:id", middleware, async (req, res, next) => {
   );
 });
 
+
+router.post("/updatedltstatus", middleware,async (req, res, next) => {
+  const data = req.body;
+
+  con.query(
+    "UPDATE app_dlt_card SET type_status =?, etc=? WHERE id=?",
+    [
+      data.type_status,
+      data.etc,
+      data.id,
+    ],
+    function (err, result) {
+      if (err) throw err;
+      return res.json(result);
+    }
+  );
+
+
+
+});
+
 module.exports = router;
