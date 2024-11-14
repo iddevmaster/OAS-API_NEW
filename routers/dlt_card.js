@@ -423,7 +423,7 @@ router.post("/listoneway", middleware,async (req, res, next) => {
 
 
   let _check_user = await runQuery(
-    "SELECT A.user_id,A.user_type,B.location_id,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE A.user_id = ?",
+    "SELECT A.user_id,A.user_type,B.location_id,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE A.user_id = ?",
     [data.user_id]
   );
 
