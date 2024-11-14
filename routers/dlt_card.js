@@ -417,12 +417,12 @@ router.post("/listallway", middleware,async (req, res, next) => {
   const offset = functions.setZero((current_page - 1) * per_page);
   
 
-
   let search_param = [];
   let u = "";
   let c = "";
 
-  let sql = "SELECT A.id,GROUP_CONCAT(C.dlt_code ORDER BY C.dlt_code SEPARATOR '/') AS dlt,A.*,(SELECT user_name from app_user where user_id = A.user_create) as full_name_create FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id  LEFT JOIN app_dlt_card_type C ON A.id = C.dlt_card_id WHERE A.status = 'Y'";
+  
+  let sql = "SELECT A.id,GROUP_CONCAT(C.dlt_code ORDER BY C.dlt_code SEPARATOR '/') AS dlt,A.*,(SELECT user_name from app_user where user_id = A.user_create) as full_name_create,D.location_id,D.country_id,E.* FROM  app_dlt_card A LEFT JOIN app_user B ON A.user_id = B.user_id LEFT JOIN app_dlt_card_type C ON A.id = C.dlt_card_id LEFT JOIN app_user_detail D ON A.user_id = D.user_id LEFT JOIN app_zipcode_lao E ON E.id = D.location_id  WHERE A.status = 'Y'";
   let sql_count = `SELECT COUNT(*) as numRows FROM  app_dlt_card A WHERE A.status = 'Y'`;
 
   if (search !== "" || search.length > 0) {
