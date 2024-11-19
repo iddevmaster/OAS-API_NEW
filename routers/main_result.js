@@ -163,6 +163,17 @@ router.get("/list?", middleware, (req, res, next) => {
     }
   );
 });
+
+router.get("/listprat?", middleware, (req, res, next) => {
+  const user_id = req.query.user_id;
+  con.query(
+    "SELECT  A.mr_id,A.mr_learn_type,A.mr_score,A.mr_status,A.udp_date AS time,B.*  FROM app_main_result A LEFT JOIN app_user B ON A.user_create = B.user_id WHERE A.user_id  = ? AND A.mr_learn_type = '2'  ORDER BY mr_id DESC",
+    [user_id],
+    (err, rows) => {
+      return res.json(rows);
+    }
+  );
+});
 //
 router.get("/list/option/?", middleware, (req, res, next) => {
   const dlt_code = req.query.dlt_code;
