@@ -76,6 +76,35 @@ router.post("/create", middleware, (req, res, next) => {
   );
 });
 
+
+router.post("/newcreate", middleware, (req, res, next) => {
+  const data = req.body;
+
+  // let start = new Date(data.ap_date_start).toISOString().split('T')[0]; // YYYY-MM-DD
+  // let end = new Date(data.ap_date_end).toISOString().split('T')[0]; // YYYY-MM-DD
+
+  const startDate = new Date(data.ap_date_start); // วันที่เริ่มต้น
+  const endDate = new Date(data.ap_date_end);   // วันที่สิ้นสุด
+  
+  let currentDate = new Date(startDate); // เริ่มต้นที่ startDate
+  const LoaDays = data.day;
+  // วนลูปแต่ละวันจนถึง endDate
+  while (currentDate <= endDate) {
+
+    const LoaDay = LoaDays[currentDate.getDay()];
+   
+    if(LoaDay){
+      console.log(`Insert ${currentDate.toISOString().split('T')[0]}: ${LoaDay}`);
+    }
+  
+    // เพิ่มวันที่ทีละ 1 วัน
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return res.json(currentDate);
+
+});
+
 router.put("/update/:ap_id", middleware, (req, res, next) => {
   const { ap_id } = req.params;
   const data = req.body;
