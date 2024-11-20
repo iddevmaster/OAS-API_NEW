@@ -77,7 +77,7 @@ router.post("/create", middleware, (req, res, next) => {
 });
 
 
-router.post("/newcreate", middleware, (req, res, next) => {
+router.post("/newcreate", middleware, async (req, res, next) => {
   const data = req.body;
 
   // let start = new Date(data.ap_date_start).toISOString().split('T')[0]; // YYYY-MM-DD
@@ -106,10 +106,25 @@ let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
   while (currentDate <= endDate) {
     const LoaDay = LoaDays[currentDate.getDay()];
     if(LoaDay){
-      let _content =  runQuery(
+      ///////////////////เช็ค วันที่ นัด หมายก่อน  
+
+      let getContent = await runQuery(
+        "select COUNT(*) as numRows from app_appointment where ap_date_first = ?",
+        [currentDate.toISOString().split('T')[0]]
+      );
+  
+      if(getContent[0]?.numRows == 0){
+        let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
         [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','A1',functions.dateAsiaThai(),functions.dateAsiaThai(), 8,8,time]
       );
+      let ap_id = result.insertId;
+      console.log(ap_id);
+      }
+    
+      ////////////////////////////////////////////// เช็คประเภท
+
+
     }
   
     // เพิ่มวันที่ทีละ 1 วัน
