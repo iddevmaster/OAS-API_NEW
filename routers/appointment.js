@@ -88,20 +88,37 @@ router.post("/newcreate", middleware, (req, res, next) => {
   
   let currentDate = new Date(startDate); // เริ่มต้นที่ startDate
   const LoaDays = data.day;
+
+
+
+
+  let now = new Date();
+
+// Set the time to 21:00:00
+now.setHours(data.selectedDateTime.hours); // Set hours to 21
+now.setMinutes(data.selectedDateTime.minutes); // Set minutes to 0
+now.setSeconds(data.selectedDateTime.seconds); // Set seconds to 0
+
+let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
+
+
   // วนลูปแต่ละวันจนถึง endDate
   while (currentDate <= endDate) {
-
     const LoaDay = LoaDays[currentDate.getDay()];
-   
     if(LoaDay){
-      console.log(`Insert ${currentDate.toISOString().split('T')[0]}: ${LoaDay}`);
+      let _content =  runQuery(
+        "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','A1',functions.dateAsiaThai(),functions.dateAsiaThai(), 8,8,time]
+      );
     }
   
     // เพิ่มวันที่ทีละ 1 วัน
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
-  return res.json(currentDate);
+  const response = {status:200
+  };
+  return res.json(response);
 
 });
 
