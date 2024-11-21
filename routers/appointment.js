@@ -117,12 +117,53 @@ let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
         let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
         [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','A1',functions.dateAsiaThai(),functions.dateAsiaThai(), 8,8,time]
-      );
+        
+      )
       let ap_id = result.insertId;
-      console.log(ap_id);
+      ////////////////////////////
+      /////////////////// Loop  DLT ////////////
+      for (var i=0; i<data.dlt_code.length; i++) {
+   
+            let checktype = await runQuery(
+        "select COUNT(*) as numRows from app_appointment_type where ap_id = ? AND dlt_code =?",
+        [ap_id,data.dlt_code[i]]
+      );   
+     
+ /////////////////// ตรวจสอบว่า มีข้อมูล DLT ไหม ////////////
+      if(checktype[0]?.numRows == 0){
+         let result = await runQuery(
+        "INSERT INTO app_appointment_type (ap_id,udp_date,dlt_code) VALUES (?,?,?)",
+        [ap_id,functions.dateAsiaThai(),data.dlt_code[i]])
+      }
+
+     }
+
+
+      }
+
+       /////////////////// กรณี มีวันแล้วแต่เพิ่ม ประเภท ////////////
+      if(getContent[0]?.numRows == 1){
+        for (var i=0; i<data.dlt_code.length; i++) {
+          let getday = await runQuery(
+            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? LIMIT 1",
+            [currentDate.toISOString().split('T')[0]]
+          );
+
+          let getdayget = await runQuery(
+            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? AND B.dlt_code = ? LIMIT 1",
+            [currentDate.toISOString().split('T')[0],data.dlt_code[i]]
+          );
+
+let ap_id = getday[0].ap_id;
+if(getdayget[0]?.numRows == 0){
+       let result = await runQuery(
+      "INSERT INTO app_appointment_type (ap_id,udp_date,dlt_code) VALUES (?,?,?)",
+      [ap_id,functions.dateAsiaThai(),data.dlt_code[i]])
+    }
+   }
       }
     
-      ////////////////////////////////////////////// เช็คประเภท
+
 
 
     }
@@ -356,9 +397,24 @@ router.get("/event/new", middleware, (req, res, next) => {
   // const last_dayt = last_day.setDate(last_day.getDate() + 14).toLocaleDateString();
   
 
+  // con.query(
+  //   "SELECT A.*,COUNT(B.ap_id) as available FROM app_appointment A LEFT JOIN app_appointment_reserve B ON A.ap_id = B.ap_id WHERE A.ap_learn_type  = ? AND A.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? GROUP BY A.ap_id ORDER BY A.ap_date_first asc",
+  //   [ap_learn_type, dlt_code, present_day,last_day],
+  //   (err, result) => {
+  //     if (err) {
+  //       return res.status(400).json({
+  //         status: 400,
+  //         message: "Bad Request", // error.sqlMessage
+  //       });
+  //     }
+  //     return res.json(result);
+  //   }
+  // );
+
+
   con.query(
-    "SELECT A.*,COUNT(B.ap_id) as available FROM app_appointment A LEFT JOIN app_appointment_reserve B ON A.ap_id = B.ap_id WHERE A.ap_learn_type  = ? AND A.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? GROUP BY A.ap_id ORDER BY A.ap_date_first asc",
-    [ap_learn_type, dlt_code, present_day,last_day],
+    "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,(select COUNT(*) from app_appointment_reserve where app_appointment_reserve.dlt_code = ? AND A.ap_date_first = ?) available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN app_appointment_reserve C ON C.ap_id = B.ap_id where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
+    [dlt_code, present_day, dlt_code,present_day,last_day],
     (err, result) => {
       if (err) {
         return res.status(400).json({
@@ -366,10 +422,10 @@ router.get("/event/new", middleware, (req, res, next) => {
           message: "Bad Request", // error.sqlMessage
         });
       }
-      // console.log(result);
       return res.json(result);
     }
   );
+
 });
 
 router.post("/reserve/create", middleware, async (req, res, next) => {
