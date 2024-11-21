@@ -413,7 +413,7 @@ router.get("/event/new", middleware, (req, res, next) => {
 
 
   con.query(
-    "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,(select COUNT(*) from app_appointment_reserve where app_appointment_reserve.dlt_code = ? AND A.ap_date_first = ?) available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN app_appointment_reserve C ON C.ap_id = B.ap_id where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
+    "SELECT A.ap_id,A.ap_quota,A.ap_date_first,A.time,B.dlt_code,(select COUNT(*) from app_appointment_reserve where app_appointment_reserve.dlt_code = ? AND A.ap_date_first = ?) available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN app_appointment_reserve C ON C.ap_id = B.ap_id where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
     [dlt_code, present_day, dlt_code,present_day,last_day],
     (err, result) => {
       if (err) {
