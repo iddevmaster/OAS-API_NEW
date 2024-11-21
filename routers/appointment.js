@@ -846,7 +846,7 @@ from app_appointment_reserve A
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
 LEFT JOIN app_user_detail D ON C.user_id = D.user_id
-WHERE DATE(B.ap_date_first) = ?
+WHERE DATE(B.ap_date_first) = ? 
     `;
     let getContent = await runQuery(sql,[ap_date_start]);
 
@@ -862,7 +862,8 @@ WHERE DATE(B.ap_date_first) = ?
     let getContentpr = await runQuery(sqls,[location]);
 
 
-    let sql = `SELECT E.province_code,D.*,A.*,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,A.user_id,B.dlt_code,C.user_firstname,C.user_lastname,C.user_prefrix,C.user_full_name,B.type,D.user_img from app_appointment_reserve A
+    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,C.*,D.*
+from app_appointment_reserve A 
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
 LEFT JOIN app_user_detail D ON C.user_id = D.user_id
@@ -870,7 +871,7 @@ LEFT JOIN app_zipcode_lao E ON E.id = D.location_id
 WHERE DATE(B.ap_date_first) = ? AND E.province_code = ?
 `;
 let getContent = await runQuery(sql,[ap_date_start,getContentpr[0].province_code]);
-  return res.json(getContent);
+  return res.json(getContentpr);
   }
 
 
