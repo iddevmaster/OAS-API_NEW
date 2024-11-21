@@ -509,28 +509,35 @@ router.post("/reserve/new/create", middleware, async (req, res, next) => {
   const ap_id = data.ap_id;
   const ap_date_first = data.ap_date_first;
   const id_card = data.id_card;
+  const dlt_code = data.dlt_code;
 const a = [];
 const test = functions.DigitRandom();
 
 
 ///////////////อันที่จองไว้แล้ว
 let getMyReserve = await runQuery(
-  "SELECT A.*,B.dlt_code,B.ap_date_first FROM app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.app_status = 'Y' AND A.user_id = ? AND B.ap_date_first = ?",
+  "SELECT A.*,B.ap_date_first FROM app_appointment_reserve A LEFT JOIN app_appointment B ON A.ap_id = B.ap_id WHERE A.app_status = 'Y' AND A.user_id = ? AND B.ap_date_first = ?",
   [user_id,ap_date_first]
 );
 
 ///////////////อันที่กำลังจะจอง
 let getMyInReserve = await runQuery(
-  "SELECT * FROM app_appointment where ap_id = ?",
-  [ap_id]
+  "SELECT * FROM app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_id = ? And B.dlt_code = ?",
+  [ap_id,dlt_code]
 );
 
 _check_reserve = getMyReserve.length;
+
+
 if (_check_reserve >= 1) {
   _check_reserveIn = getMyInReserve;
 
+  
+
   const datainarray = await functions.Arrayall(getMyReserve,_check_reserveIn);
+
 const checkdup = await functions.Checkdupi(datainarray);
+
 
 
 ////////////////////กรณี ซ้ำ
@@ -558,8 +565,8 @@ if(checkdup == false){
   }else {
 
     let _content = await runQuery(
-      "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
-      [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
+      "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card,dlt_code) VALUES (?,?,?,?,?,?,?)",
+      [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card,dlt_code]
     );
     
     
@@ -582,8 +589,8 @@ if (_check_reserve == 0) {
 
 
   let getMyInReserve = await runQuery(
-    "SELECT * FROM app_appointment where ap_id = ?",
-    [ap_id]
+    "SELECT * FROM app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_id = ? And B.dlt_code = ?",
+    [ap_id,dlt_code]
   );
   const quota = getMyInReserve[0].ap_quota
 
@@ -600,8 +607,8 @@ if (_check_reserve == 0) {
   }else {
 
     let _content = await runQuery(
-  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card) VALUES (?,?,?,?,?,?)",
-  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card]
+  "INSERT INTO app_appointment_reserve (ap_id,user_id,ap_number,udp_date,app_status,id_card,dlt_code) VALUES (?,?,?,?,?,?,?)",
+  [ap_id, user_id ,test, functions.dateAsiaThai(),'Y',id_card,dlt_code]
 );
 
 
