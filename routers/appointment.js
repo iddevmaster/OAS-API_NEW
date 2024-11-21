@@ -392,7 +392,9 @@ router.get("/event/new", middleware, (req, res, next) => {
   let ap_learn_type = req.query.ap_learn_type;
   let dlt_code = req.query.dlt_code;
   const present_day = new Date().toISOString().split("T")[0];
- 
+  const ap_date_first = new Date().toISOString().split("T")[0];
+
+
   const last_day = new Date(Date.now()+14*24*60*60*1000).toISOString().split("T")[0];;
   // const last_dayt = last_day.setDate(last_day.getDate() + 14).toLocaleDateString();
   
@@ -413,8 +415,8 @@ router.get("/event/new", middleware, (req, res, next) => {
 
 
   con.query(
-    "SELECT A.ap_id,A.ap_quota,A.ap_date_first,A.time,B.dlt_code,(select COUNT(*) from app_appointment_reserve where app_appointment_reserve.dlt_code = ? AND A.ap_date_first = ?) available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN app_appointment_reserve C ON C.ap_id = B.ap_id where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
-    [dlt_code, present_day, dlt_code,present_day,last_day],
+    "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
+    [dlt_code,present_day,last_day],
     (err, result) => {
       if (err) {
         return res.status(400).json({
