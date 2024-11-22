@@ -147,12 +147,12 @@ let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
       if(getContent[0]?.numRows == 1){
         for (var i=0; i<data.dlt_code.length; i++) {
           let getday = await runQuery(
-            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? A.cancelled=1 LIMIT 1",
+            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? LIMIT 1",
             [currentDate.toISOString().split('T')[0]]
           );
 
           let getdayget = await runQuery(
-            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? AND B.dlt_code = ? AND A.cancelled=1 LIMIT 1",
+            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? AND B.dlt_code = ? LIMIT 1",
             [currentDate.toISOString().split('T')[0],data.dlt_code[i]]
           );
 
