@@ -111,14 +111,14 @@ let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
       ///////////////////เช็ค วันที่ นัด หมายก่อน  
 
       let getContent = await runQuery(
-        "select COUNT(*) as numRows from app_appointment where ap_date_first = ?",
+        "select COUNT(*) as numRows from app_appointment where ap_date_first = ? AND cancelled=1",
         [currentDate.toISOString().split('T')[0]]
       );
   
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,user_full) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','A1',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,user_full]
+        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,user_full]
         
       )
       let ap_id = result.insertId;
@@ -147,12 +147,12 @@ let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
       if(getContent[0]?.numRows == 1){
         for (var i=0; i<data.dlt_code.length; i++) {
           let getday = await runQuery(
-            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? LIMIT 1",
+            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? A.cancelled=1 LIMIT 1",
             [currentDate.toISOString().split('T')[0]]
           );
 
           let getdayget = await runQuery(
-            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? AND B.dlt_code = ? LIMIT 1",
+            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_date_first = ? AND B.dlt_code = ? AND A.cancelled=1 LIMIT 1",
             [currentDate.toISOString().split('T')[0],data.dlt_code[i]]
           );
 
