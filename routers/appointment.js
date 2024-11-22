@@ -111,7 +111,7 @@ let time = now.toTimeString().split(' ')[0]; // Extracts '21:00:00'
       ///////////////////เช็ค วันที่ นัด หมายก่อน  
 
       let getContent = await runQuery(
-        "select COUNT(*) as numRows from app_appointment where ap_date_first = ? AND cancelled=1",
+        "select COUNT(*) as numRows from app_appointment where  cancelled = 1 AND ap_date_first=?",
         [currentDate.toISOString().split('T')[0]]
       );
   
