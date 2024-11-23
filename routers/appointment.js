@@ -396,16 +396,49 @@ router.post("/listall", middleware, async (req, res, next) => {
   const start = data.ap_date_start;
   const end = data.ap_date_end;
 
+
+
+  const current_page = data.page;
+  const per_page = data.per_page <= 50 ? data.per_page : 50;
+  const search = data.search;
+  const offset = functions.setZero((current_page - 1) * per_page);
+  let total = 0;
+  let total_filter = 0;
+
   let sql = `
 SELECT A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
 LEFT JOIN app_user F ON F.user_id = A.user_crt
 LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
-HAVING A.ap_date_first BETWEEN ? AND ?;
+HAVING A.ap_date_first BETWEEN ? AND ?
    `;
     // console.log(date_event);
+
+
+    sql += ` LIMIT ${offset},${per_page} `;
     let getAppointment = await runQuery(sql,[start,end]);
-  return res.json(getAppointment);
-  });
+
+
+
+    let sql_count =
+    "select COUNT(*) as numRows  from app_appointment A WHERE A.cancelled = 1 AND A.ap_date_first BETWEEN ? AND ?";
+  let getCountAll = await runQuery(sql_count,[start,end]);
+
+  total = getCountAll[0] !== undefined ? getCountAll[0]?.numRows : 0;
+
+  
+
+  const response = {
+    total: total, // จำนวนรายการทั้งหมด
+    total_filter: total, // จำนวนรายการทั้งหมด
+    current_page: current_page, // หน้าที่กำลังแสดงอยู่
+    limit_page: per_page, // limit data
+    total_page: Math.ceil(total / per_page), // จำนวนหน้าทั้งหมด
+    search: search, // คำค้นหา
+    data: getAppointment, // รายการข้อมูล
+  };
+
+  return res.json(response);
+});
 
 router.get("/event/new", middleware, (req, res, next) => {
   let ap_learn_type = req.query.ap_learn_type;
