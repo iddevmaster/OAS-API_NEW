@@ -397,7 +397,9 @@ router.post("/listall", middleware, async (req, res, next) => {
   const end = data.ap_date_end;
 
   let sql = `
-SELECT A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
+SELECT A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
+LEFT JOIN app_user F ON F.user_id = A.user_crt
+LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
 HAVING A.ap_date_first BETWEEN ? AND ?;
    `;
     // console.log(date_event);
