@@ -1042,7 +1042,7 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
   const ap_number = req.ap_number;
   
   let getContent = await runQuery(
-    "SELECT * from app_appointment_reserve A LEFT JOIN app_user B ON A.user_id = B.user_id LEFT JOIN app_appointment C ON C.ap_id = A.ap_id LEFT JOIN app_user_detail D ON D.user_id = A.user_id LEFT JOIN app_zipcode_lao E ON D.location_id = E.id LEFT JOIN app_country F ON D.country_id = F.country_id WHERE A.ap_number =? LIMIT 1",
+    "SELECT *,A.dlt_code As dlt_types from app_appointment_reserve A LEFT JOIN app_user B ON A.user_id = B.user_id LEFT JOIN app_appointment C ON C.ap_id = A.ap_id LEFT JOIN app_user_detail D ON D.user_id = A.user_id LEFT JOIN app_zipcode_lao E ON D.location_id = E.id LEFT JOIN app_country F ON D.country_id = F.country_id WHERE A.ap_number =? LIMIT 1",
     [data.ap_number]
   );
   const response = getContent;
