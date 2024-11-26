@@ -963,7 +963,7 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
   if(user_type == 1){
 
 
-    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,C.*,D.*
+    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS mr_status_p,C.*,D.*
 from app_appointment_reserve A 
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
@@ -984,7 +984,7 @@ WHERE DATE(B.ap_date_first) = ?
     let getContentpr = await runQuery(sqls,[location]);
 
 
-    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2) AS mr_status_p,C.*,D.*
+    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS mr_status_p,C.*,D.*
 from app_appointment_reserve A 
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
