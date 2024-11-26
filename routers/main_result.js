@@ -43,7 +43,7 @@ router.post("/create", middleware, (req, res, next) => {
       }
       let user_id = rows[0]?.user_id;
       con.query(
-        "INSERT INTO app_main_result (mr_score,mr_learn_type,mr_status,dlt_code,crt_date,udp_date,user_id,user_create,ref_number,remark,app_number) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        "INSERT INTO app_main_result (mr_score,mr_learn_type,mr_status,dlt_code,crt_date,udp_date,user_id,user_create,ref_number,remark,ap_number) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         [
           data.mr_score,
           data.mr_learn_type,
@@ -55,7 +55,7 @@ router.post("/create", middleware, (req, res, next) => {
           user_id_staff,
           ref_number,
           remark,
-          data.app_number,
+          data.ap_number,
         ],
         function (err, result) {
           if (err) throw err;
