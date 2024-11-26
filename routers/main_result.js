@@ -116,8 +116,7 @@ router.put("/update/:mr_id", middleware, (req, res, next) => {
           data.ref_number,
           data.remark,
           data.ap_number,
-          data.mr_learn_type,
-     
+          data.mr_learn_type
         ],
         function (err, result) {
           if (err) throw err;
