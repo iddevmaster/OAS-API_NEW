@@ -417,12 +417,12 @@ router.post("/listall", middleware, async (req, res, next) => {
     [data.user_id]
   );
 
- 
+
   if(_check_user[0].user_type == '1'){
 
 
     let sql = `
-    SELECT A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
+    SELECT A.province_code,A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
     LEFT JOIN app_user F ON F.user_id = A.user_crt
     LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
     HAVING A.ap_date_first BETWEEN ? AND ?
@@ -465,16 +465,16 @@ router.post("/listall", middleware, async (req, res, next) => {
 
     
     let sql = `
-    SELECT A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
+    SELECT A.province_code,A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
     LEFT JOIN app_user F ON F.user_id = A.user_crt
     LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
-    HAVING A.ap_date_first BETWEEN ? AND ?
+    HAVING A.ap_date_first BETWEEN ? AND ? AND A.province_code = ?
        `;
         // console.log(date_event);
     
     
         sql += ` LIMIT ${offset},${per_page} `;
-        let getAppointment = await runQuery(sql,[start,end]);
+        let getAppointment = await runQuery(sql,[start,end,_check_user[0].province_code]);
     
     
     
@@ -496,7 +496,7 @@ router.post("/listall", middleware, async (req, res, next) => {
         data: getAppointment, // รายการข้อมูล
       };
     
-      return res.json(_check_user);
+      return res.json(response);
 
   }
 
