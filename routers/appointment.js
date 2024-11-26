@@ -440,6 +440,25 @@ HAVING A.ap_date_first BETWEEN ? AND ?
   return res.json(response);
 });
 
+
+router.post("/totalquata", middleware, async (req, res, next) => {
+
+  const data = req.body;
+
+  const id = data.id;
+  
+  let sql = `
+SELECT A.ap_id,A.dlt_code,C.ap_quota,(Select COUNT(*) from app_appointment_reserve o where o.dlt_code = A.dlt_code AND o.ap_id = A.ap_id)  AS AA from app_appointment_type A 
+LEFT JOIN app_appointment_reserve B ON A.ap_id = B.ap_id
+LEFT JOIN app_appointment C ON C.ap_id = A.ap_id
+where A.ap_id = ?
+   `;
+
+   let getAppointment = await runQuery(sql,[id]);
+
+  return res.json(getAppointment);
+});
+
 router.get("/event/new", middleware, (req, res, next) => {
   let ap_learn_type = req.query.ap_learn_type;
   let dlt_code = req.query.dlt_code;
