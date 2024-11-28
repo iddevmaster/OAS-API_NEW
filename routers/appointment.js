@@ -87,15 +87,23 @@ router.post("/newcreate", middleware, async (req, res, next) => {
   const startDate = new Date(data.ap_date_start); // วันที่เริ่มต้น
   const endDate = new Date(data.ap_date_end);   // วันที่สิ้นสุด
   
-  let currentDate = new Date(startDate); // เริ่มต้นที่ startDate
-  const LoaDays = data.day;
+  let currentDate = new Date(data.ap_date_start); // เริ่มต้นที่ startDate
+
+
+
+
+ 
+     
+
+  const LoaDays = data.day
+
   const user_id = data.user_id;
   const user_full = data.peop_addrs;
 
   const group_id = data.group_id;
 
 
-
+  
 
   let now = new Date();
 
@@ -118,20 +126,25 @@ let _check_user = await runQuery(
 
   // วนลูปแต่ละวันจนถึง endDate
   while (currentDate <= endDate) {
+
+
     const LoaDay = LoaDays[currentDate.getDay()];
+
+  
     
-    if(LoaDay){
+    if(LoaDay.select == true){
       ///////////////////เช็ค วันที่ นัด หมายก่อน  
      
       let getContent = await runQuery(
         "select COUNT(*) as numRows from app_appointment where  cancelled = 1 AND ap_date_first=? AND group_id =?",
         [currentDate.toISOString().split('T')[0],group_id]
       );
+
   
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
-        "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,group_id]
+        "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id,day) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,group_id,LoaDay.days]
         
       )
       let ap_id = result.insertId;
@@ -160,7 +173,7 @@ let _check_user = await runQuery(
       if(getContent[0]?.numRows == 1){
         
         for (var i=0; i<data.dlt_code.length; i++) {
-         console.log(data.dlt_code);
+     
           let getday = await runQuery(
             "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? AND group_id =?  LIMIT 1",
             [currentDate.toISOString().split('T')[0],group_id]
