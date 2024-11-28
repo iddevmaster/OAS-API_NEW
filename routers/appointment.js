@@ -559,7 +559,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
 
   let _check_user = await runQuery(
     "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
-    [data.user_id]
+    [user_id]
   );
 
 
