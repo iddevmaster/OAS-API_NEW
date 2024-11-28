@@ -524,45 +524,62 @@ where A.ap_id = ?
   return res.json(getAppointment);
 });
 
-router.get("/event/new", middleware, (req, res, next) => {
+router.get("/event/new", middleware, async (req, res, next) => {
   let ap_learn_type = req.query.ap_learn_type;
   let dlt_code = req.query.dlt_code;
+  let user_id = req.query.user_id;
   const present_day = new Date().toISOString().split("T")[0];
   const ap_date_first = new Date().toISOString().split("T")[0];
 
 
-  const last_day = new Date(Date.now()+14*24*60*60*1000).toISOString().split("T")[0];;
-  // const last_dayt = last_day.setDate(last_day.getDate() + 14).toLocaleDateString();
-  
-
-  // con.query(
-  //   "SELECT A.*,COUNT(B.ap_id) as available FROM app_appointment A LEFT JOIN app_appointment_reserve B ON A.ap_id = B.ap_id WHERE A.ap_learn_type  = ? AND A.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? GROUP BY A.ap_id ORDER BY A.ap_date_first asc",
-  //   [ap_learn_type, dlt_code, present_day,last_day],
-  //   (err, result) => {
-  //     if (err) {
-  //       return res.status(400).json({
-  //         status: 400,
-  //         message: "Bad Request", // error.sqlMessage
-  //       });
-  //     }
-  //     return res.json(result);
-  //   }
-  // );
+  const last_day = new Date(Date.now()+14*24*60*60*1000).toISOString().split("T")[0];
 
 
-  con.query(
-    "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
-    [dlt_code,present_day,last_day],
-    (err, result) => {
-      if (err) {
-        return res.status(400).json({
-          status: 400,
-          message: "Bad Request", // error.sqlMessage
-        });
-      }
-      return res.json(result);
-    }
+  let _check_user = await runQuery(
+    "SELECT A.user_id,A.user_type,B.location_id,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE A.user_id = ?",
+    [user_id]
   );
+
+  const provice = _check_user[0].provice;
+
+
+  if(_check_user[0].user_type == '1'){
+
+    con.query(
+      "SELECT A.province_code,A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
+      [dlt_code,present_day,last_day],
+      (err, result) => {
+        if (err) {
+          return res.status(400).json({
+            status: 400,
+            message: "Bad Request", // error.sqlMessage
+          });
+        }
+        return res.json(result);
+      }
+    );
+
+  }
+
+  if(_check_user[0].user_type == '2'){
+    con.query(
+      "SELECT A.province_code,A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? AND A.province_code = ?",
+      [dlt_code,present_day,last_day,provice],
+      (err, result) => {
+        if (err) {
+          return res.status(400).json({
+            status: 400,
+            message: "Bad Request", // error.sqlMessage
+          });
+        }
+        return res.json(result);
+      }
+    );
+    
+  }
+
+
+
 
 });
 
