@@ -564,8 +564,6 @@ router.get("/event/new", middleware, async (req, res, next) => {
 
 
   const provice = _check_user[0].provice;
-
-
   if(_check_user[0].user_type == '1'){
 
     con.query(

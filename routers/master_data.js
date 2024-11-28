@@ -62,8 +62,9 @@ router.post("/provice", middleware, async (req, res, next) => {
   const data = req.body;
 
 
+
   let _check_user = await runQuery(
-    "SELECT A.user_id,A.user_type,B.location_id,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE A.user_id = ?",
+    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
     [data.user_id]
   );
  if(_check_user[0].user_type == 1){
@@ -78,10 +79,10 @@ router.post("/provice", middleware, async (req, res, next) => {
 
  if(_check_user[0].user_type == 2){
 
-  let sql = "SELECT A.province_code,A.group_id,A.name,B.province_name,B.amphur_name FROM app_group A LEFT JOIN app_zipcode_lao B ON A.province_code = B.province_code WHERE A.province_code =?  GROUP BY A.province_code,A.group_id ORDER BY A.province_code";
+  let sql = "SELECT A.group_id,A.users_id,B.name,B.province_code,C.province_name FROM app_group_users A LEFT JOIN app_group B ON A.group = B.group_id LEFT JOIN app_zipcode_lao C ON C.province_code = B.province_code WHERE A.users_id = ? GROUP BY A.group_id,A.users_id";
 
 
-  let results = await runQuery(sql,[_check_user[0].province_code]);
+  let results = await runQuery(sql,data.user_id);
 
   const result = {
     data: results, // รายการข้อมูล
