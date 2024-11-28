@@ -4,6 +4,12 @@ const con = require("../database");
 const middleware = require("../middleware");
 const common = require("../common");
 const functions = require("../functions");
+
+async function runQuery(sql, param) {
+  return new Promise((resolve, reject) => {
+    resolve(con.query(sql, param));
+  });
+}
 router.post("/zipcode", middleware, (req, res, next) => {
   const data = req.body;
   const current_page = data.page;
@@ -52,21 +58,43 @@ router.post("/zipcode", middleware, (req, res, next) => {
 });
 
 
-router.post("/provice", middleware, (req, res, next) => {
+router.post("/provice", middleware, async (req, res, next) => {
+  const data = req.body;
+
+
+  let _check_user = await runQuery(
+    "SELECT A.user_id,A.user_type,B.location_id,C.* FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id WHERE A.user_id = ?",
+    [data.user_id]
+  );
+ if(_check_user[0].user_type == 1){
+  let sql = "SELECT province_code,province_name FROM app_zipcode_lao  GROUP BY province_code";
+  
+  let results = await runQuery(sql);
+  const result = {
+    data: results, // รายการข้อมูล
+  };
+  return res.json(result);
+ }
+
+ if(_check_user[0].user_type == 2){
+
+  let sql = "SELECT province_code,province_name FROM app_zipcode_lao WHERE province_code =? GROUP BY province_code";
+
+
+  let results = await runQuery(sql,[_check_user[0].province_code]);
+
+  const result = {
+    data: results, // รายการข้อมูล
+  };
+
+
+  return res.json(result);
+ }
  
 
-  let sql = "SELECT province_code,province_name FROM app_zipcode_lao GROUP BY province_code";
-  con.query(sql, (err, results) => {
-    total = results.length;
-  });
+  
 
-  // query ข้อมูล
-  con.query(sql, (err, results) => {
-    const result = {
-      data: results, // รายการข้อมูล
-    };
-    return res.json(result);
-  });
+
 });
 
 router.post("/contry", middleware, (req, res, next) => {
