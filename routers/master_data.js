@@ -51,6 +51,24 @@ router.post("/zipcode", middleware, (req, res, next) => {
   });
 });
 
+
+router.post("/provice", middleware, (req, res, next) => {
+ 
+
+  let sql = "SELECT province_code,province_name FROM app_zipcode_lao GROUP BY province_code";
+  con.query(sql, (err, results) => {
+    total = results.length;
+  });
+
+  // query ข้อมูล
+  con.query(sql, (err, results) => {
+    const result = {
+      data: results, // รายการข้อมูล
+    };
+    return res.json(result);
+  });
+});
+
 router.post("/contry", middleware, (req, res, next) => {
   const data = req.body;
   const current_page = data.page;
