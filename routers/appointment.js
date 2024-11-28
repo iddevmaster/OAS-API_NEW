@@ -5,6 +5,7 @@ const middleware = require("../middleware");
 const functions = require("../functions");
 const common = require("../common");
 
+
 async function runQuery(sql, param) {
   return new Promise((resolve, reject) => {
     resolve(con.query(sql, param));
@@ -118,9 +119,10 @@ let _check_user = await runQuery(
   // วนลูปแต่ละวันจนถึง endDate
   while (currentDate <= endDate) {
     const LoaDay = LoaDays[currentDate.getDay()];
+    
     if(LoaDay){
       ///////////////////เช็ค วันที่ นัด หมายก่อน  
-
+     
       let getContent = await runQuery(
         "select COUNT(*) as numRows from app_appointment where  cancelled = 1 AND ap_date_first=? AND group_id =?",
         [currentDate.toISOString().split('T')[0],group_id]
@@ -156,7 +158,9 @@ let _check_user = await runQuery(
 
        /////////////////// กรณี มีวันแล้วแต่เพิ่ม ประเภท ////////////
       if(getContent[0]?.numRows == 1){
+        
         for (var i=0; i<data.dlt_code.length; i++) {
+         console.log(data.dlt_code);
           let getday = await runQuery(
             "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? AND group_id =?  LIMIT 1",
             [currentDate.toISOString().split('T')[0],group_id]
@@ -168,6 +172,7 @@ let _check_user = await runQuery(
           );
 
 let ap_id = getday[0].ap_id;
+
 if(getdayget[0]?.numRows == 0){
        let result = await runQuery(
       "INSERT INTO app_appointment_type (ap_id,udp_date,dlt_code) VALUES (?,?,?)",
@@ -175,16 +180,21 @@ if(getdayget[0]?.numRows == 0){
     }
 
     if(getdayget[0]?.numRows == 1){
-      let t = {day:currentDate.toISOString().split('T')[0],dlt:data.dlt_code[i],status:false};
+       t = {day:currentDate.toISOString().split('T')[0],dlt:data.dlt_code[i],status:false};
       fas.push(t);
      }
    }
       }
     
     }
+
+  
   
     // เพิ่มวันที่ทีละ 1 วัน
     currentDate.setDate(currentDate.getDate() + 1);
+ 
+
+    
   }
 
   const response = {dayfalse:fas,dltfalase:dltas
