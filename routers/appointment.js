@@ -546,7 +546,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
   if(_check_user[0].user_type == '1'){
 
     con.query(
-      "SELECT A.province_code,A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?",
+      "SELECT A.province_code,A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,A.province_code,F.province_name from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_zipcode_lao F ON A.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?  GROUP BY A.ap_id",
       [dlt_code,present_day,last_day],
       (err, result) => {
         if (err) {
@@ -563,7 +563,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
 
   if(_check_user[0].user_type == '2'){
     con.query(
-      "SELECT A.province_code,A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? AND A.province_code = ?",
+      "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,A.province_code,F.province_name from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_zipcode_lao F ON A.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? AND A.province_code = ? GROUP BY A.ap_id",
       [dlt_code,present_day,last_day,provice],
       (err, result) => {
         if (err) {
