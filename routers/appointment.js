@@ -498,7 +498,7 @@ router.post("/listall", middleware, async (req, res, next) => {
     
     
         sql += ` LIMIT ${offset},${per_page} `;
-        let getAppointment = await runQuery(sql,[start,end,_check_user[0].group]);
+        let getAppointment = await runQuery(sql,[start,end,_check_user[0].group_id]);
     
     
     
