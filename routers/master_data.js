@@ -68,7 +68,7 @@ router.post("/provice", middleware, async (req, res, next) => {
     [data.user_id]
   );
  if(_check_user[0].user_type == 1){
-  let sql = "SELECT A.province_code,A.group_id,A.name,B.province_name,B.amphur_name FROM app_group A LEFT JOIN app_zipcode_lao B ON A.province_code = B.province_code GROUP BY B.province_code,A.group_id ORDER BY A.province_code";
+  let sql = "SELECT A.group_id,A.users_id,B.name,B.province_code,C.province_name FROM app_group_users A LEFT JOIN app_group B ON A.group = B.group_id LEFT JOIN app_zipcode_lao C ON C.province_code = B.province_code GROUP BY A.group_id,A.users_id";
   
   let results = await runQuery(sql);
   const result = {
