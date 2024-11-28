@@ -119,8 +119,8 @@ const province_code = _check_user[0].province_code;
       ///////////////////เช็ค วันที่ นัด หมายก่อน  
 
       let getContent = await runQuery(
-        "select COUNT(*) as numRows from app_appointment where  cancelled = 1 AND ap_date_first=?",
-        [currentDate.toISOString().split('T')[0]]
+        "select COUNT(*) as numRows from app_appointment where  cancelled = 1 AND ap_date_first=? AND province_code =?",
+        [currentDate.toISOString().split('T')[0],province_code]
       );
   
       if(getContent[0]?.numRows == 0){
@@ -155,13 +155,13 @@ const province_code = _check_user[0].province_code;
       if(getContent[0]?.numRows == 1){
         for (var i=0; i<data.dlt_code.length; i++) {
           let getday = await runQuery(
-            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? LIMIT 1",
-            [currentDate.toISOString().split('T')[0]]
+            "select * from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? AND province_code =?  LIMIT 1",
+            [currentDate.toISOString().split('T')[0],province_code]
           );
 
           let getdayget = await runQuery(
-            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? AND B.dlt_code = ? LIMIT 1",
-            [currentDate.toISOString().split('T')[0],data.dlt_code[i]]
+            "select COUNT(*) as numRows from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.cancelled=1 AND A.ap_date_first = ? AND B.dlt_code = ? AND province_code =? LIMIT 1",
+            [currentDate.toISOString().split('T')[0],data.dlt_code[i],province_code]
           );
 
 let ap_id = getday[0].ap_id;
