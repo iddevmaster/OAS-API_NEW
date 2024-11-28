@@ -102,7 +102,7 @@ router.post("/newcreate", middleware, async (req, res, next) => {
 
   const group_id = data.group_id;
 
-
+  const peop_addrs = data.peop_addrs;
   
 
   let now = new Date();
@@ -143,8 +143,8 @@ let _check_user = await runQuery(
   
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
-        "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id,day) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,group_id,LoaDay.days]
+        "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id,day,peop_addrs) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,group_id,LoaDay.days,peop_addrs]
         
       )
       let ap_id = result.insertId;
@@ -493,10 +493,11 @@ router.post("/listall", middleware, async (req, res, next) => {
 
     
     let sql = `
-    SELECT A.province_code,A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
+    SELECT A.day,A.group_id,G.name,A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.user_full,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
     LEFT JOIN app_user F ON F.user_id = A.user_crt
+    LEFT JOIN app_group G ON G.group_id = A.group_id
     LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
-    HAVING A.ap_date_first BETWEEN ? AND ? AND A.province_code = ?
+    HAVING A.ap_date_first BETWEEN ? AND ? AND A.group_id = 1
        `;
         // console.log(date_event);
     
