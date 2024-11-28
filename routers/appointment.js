@@ -126,7 +126,7 @@ const province_code = _check_user[0].province_code;
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,user_full,province_code) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,user_full,user_full]
+        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,user_full,province_code]
         
       )
       let ap_id = result.insertId;
