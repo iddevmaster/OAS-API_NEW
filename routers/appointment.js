@@ -558,7 +558,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
 
 
   let _check_user = await runQuery(
-    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group_id,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
+    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group_id,D.group,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
     [user_id]
   );
 
@@ -586,7 +586,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
   
     con.query(
       "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,A.province_code,F.province_name,A.group_id from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_zipcode_lao F ON A.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? AND A.group_id = ? GROUP BY A.ap_id",
-      [dlt_code,present_day,last_day,_check_user[0].group_id],
+      [dlt_code,present_day,last_day,_check_user[0].group],
       (err, result) => {
         if (err) {
           return res.status(400).json({
