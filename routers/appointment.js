@@ -436,7 +436,7 @@ router.post("/listall", middleware, async (req, res, next) => {
 
 
   let _check_user = await runQuery(
-    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group_id,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
+    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
     [data.user_id]
   );
 
@@ -488,17 +488,17 @@ router.post("/listall", middleware, async (req, res, next) => {
 
     
     let sql = `
-    SELECT A.day,A.group_id,G.name,A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.peop_addrs,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
+    SELECT A.day,A.group,G.name,A.ap_id,SUM(A.ap_quota) As quata,A.time,A.ap_date_first,F.user_firstname,F.user_lastname,A.peop_addrs,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,IFNULL(E.order_count, 0) AS available from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id 
     LEFT JOIN app_user F ON F.user_id = A.user_crt
     LEFT JOIN app_group G ON G.group_id = A.group_id
     LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id) E ON A.ap_id = E.ap_id GROUP BY A.ap_id,A.ap_quota
-    HAVING A.ap_date_first BETWEEN ? AND ? AND A.group_id = ?
+    HAVING A.ap_date_first BETWEEN ? AND ? AND A.group = ?
        `;
         // console.log(date_event);
     
     
         sql += ` LIMIT ${offset},${per_page} `;
-        let getAppointment = await runQuery(sql,[start,end,_check_user[0].group_id]);
+        let getAppointment = await runQuery(sql,[start,end,_check_user[0].group]);
     
     
     
