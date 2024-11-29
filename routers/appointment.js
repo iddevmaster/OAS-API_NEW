@@ -585,7 +585,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
   if(_check_user[0].user_type == '2'){
   
     con.query(
-      "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,A.province_code,F.province_name,A.group_id from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_zipcode_lao F ON A.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? AND A.group_id = ? GROUP BY A.ap_id",
+      "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,F.province_code,F.province_name,A.group_id from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_group G ON G.group_id = A.group_id LEFT JOIN app_zipcode_lao F ON G.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? AND A.group_id = ? GROUP BY A.ap_id",
       [dlt_code,present_day,last_day,_check_user[0].group],
       (err, result) => {
         if (err) {
