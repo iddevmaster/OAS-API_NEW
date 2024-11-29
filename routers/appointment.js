@@ -567,7 +567,7 @@ router.get("/event/new", middleware, async (req, res, next) => {
   if(_check_user[0].user_type == '1'){
 
     con.query(
-      "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,F.province_code,F.province_name,A.group_id,G.name from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_group G ON G.group_id = A.group_id LEFT JOIN app_zipcode_lao F ON G.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? GROUP BY A.ap_id",
+      "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,F.province_code,F.province_name,A.group_id,G.name from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_group G ON G.group_id = A.group_id LEFT JOIN app_zipcode_lao F ON G.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ?  GROUP BY A.ap_id",
       [dlt_code,present_day,last_day],
       (err, result) => {
         if (err) {
@@ -996,22 +996,23 @@ router.post("/dateappointment", middleware, async (req, res, next) => {
   const user_id = data.user_id;
   const location = data.location_id;
   const user_type = data.user_type;
+  const group = data.group;
 
-
-
- 
+  let _check_user = await runQuery(
+    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group_id,D.group,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
+    [data.user_id]
+  );
 
   if(user_type == 1){
-
-
-    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS mr_status_p,C.*,D.*
+    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,B.group_id,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS mr_status_p,C.*,D.*
 from app_appointment_reserve A 
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
 LEFT JOIN app_user_detail D ON C.user_id = D.user_id
-WHERE DATE(B.ap_date_first) = ? 
+LEFT JOIN app_zipcode_lao E ON E.id = D.location_id
+WHERE DATE(B.ap_date_first) = ? AND B.group_id = ?
     `;
-    let getContent = await runQuery(sql,[ap_date_start]);
+    let getContent = await runQuery(sql,[ap_date_start,group]);
 
       return res.json(getContent);
     
@@ -1020,20 +1021,20 @@ WHERE DATE(B.ap_date_first) = ?
 
   if(user_type == 2){
 
-    let sqls = `select * from app_zipcode_lao where id = ? `;
+    // let sqls = `select * from app_zipcode_lao where id = ? `;
 
-    let getContentpr = await runQuery(sqls,[location]);
+    // let getContentpr = await runQuery(sqls,[location]);
 
 
-    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS mr_status_p,C.*,D.*
+    let sql = `select A.ar_id,A.dlt_code,B.ap_date_first,B.time,B.group_id,A.user_id,A.ap_number,A.id_card,A.st_id,A.app_status,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS thero,(SELECT mr_score FROM app_main_result WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS pratic,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 1 AND dlt_code = A.dlt_code) AS mr_status_t,(select mr_status from app_main_result  WHERE user_id= A.user_id AND mr_learn_type = 2 AND dlt_code = A.dlt_code) AS mr_status_p,C.*,D.*
 from app_appointment_reserve A 
 LEFT JOIN app_appointment B ON A.ap_id = B.ap_id
 LEFT JOIN app_user C ON C.user_id = A.user_id
 LEFT JOIN app_user_detail D ON C.user_id = D.user_id
 LEFT JOIN app_zipcode_lao E ON E.id = D.location_id
-WHERE DATE(B.ap_date_first) = ? AND E.province_code = ?
+WHERE DATE(B.ap_date_first) = ? AND B.group_id = ?
 `;
-let getContent = await runQuery(sql,[ap_date_start,getContentpr[0].province_code]);
+let getContent = await runQuery(sql,[ap_date_start,_check_user[0].group]);
   return res.json(getContent);
   }
 

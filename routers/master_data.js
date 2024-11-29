@@ -98,6 +98,21 @@ router.post("/provice", middleware, async (req, res, next) => {
 
 });
 
+
+
+router.post("/proviceall", middleware, async (req, res, next) => {
+  const data = req.body;
+
+  let sql = "SELECT province_code,province_name from app_zipcode_lao GROUP BY province_code,province_name";
+  
+  let results = await runQuery(sql);
+  const result = {
+    data: results, // รายการข้อมูล
+  };
+  return res.json(result);
+
+});
+
 router.post("/contry", middleware, (req, res, next) => {
   const data = req.body;
   const current_page = data.page;
