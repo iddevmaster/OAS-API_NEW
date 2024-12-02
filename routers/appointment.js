@@ -881,6 +881,7 @@ router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
         udp_date: el?.udp_date,
         ap_number: el?.ap_number,
         group: el?.name,
+        time: el?.time,
         province_name: el?.province_name,
         appointment_detail: appointment_detail,
       };
