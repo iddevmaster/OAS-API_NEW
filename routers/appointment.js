@@ -865,7 +865,7 @@ router.get("/reserve/get/:user_id", middleware, (req, res, next) => {
   INNER JOIN app_appointment t2 ON t2.ap_id = t1.ap_id AND t2.cancelled=1 
   LEFT JOIN app_group t6 ON t2.group_id = t6.group_id
   INNER JOIN app_zipcode_lao t7 ON t7.province_code = t6.province_code
-  WHERE t1.user_id = ?  GROUP BY t1.ap_id,t7.province_name ORDER BY ABS(DATEDIFF(t2.ap_date_first, CURRENT_DATE))`;
+  WHERE t1.user_id = ? AND t1.app_status = 'Y' GROUP BY t1.ap_id,t7.province_name ORDER BY ABS(DATEDIFF(t2.ap_date_first, CURRENT_DATE))`;
   con.query(sql, [user_id], function (err, result) {
     if (err) throw err;
     let obj = [];
