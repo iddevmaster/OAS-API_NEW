@@ -145,7 +145,7 @@ router.post("/group", middleware, async (req, res, next) => {
     [_check_user[0].location_id]
   );
   
-  let sqlgroup = "select * from app_group where province_code = ?";
+  let sqlgroup = "select A.*,B.province_name from app_group A LEFT JOIN app_zipcode_lao B ON A.province_code = B.province_code WHERE B.province_code = ? GROUP BY A.group_id";
  let results = await runQuery(sqlgroup,_check_user_pro[0].province_code);
   const result = {
     data: results, // รายการข้อมูล
