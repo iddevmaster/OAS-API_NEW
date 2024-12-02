@@ -128,6 +128,33 @@ router.post("/provicegroup", middleware, async (req, res, next) => {
 });
 
 
+router.post("/group", middleware, async (req, res, next) => {
+  const data = req.body;
+  const user_id = data.user_id;
+
+
+  let _check_user = await runQuery(
+    "SELECT A.user_id,A.user_type,B.location_id,C.*,D.group_id,E.`name` FROM app_user A LEFT JOIN app_user_detail B ON A.user_id = B.user_id LEFT JOIN app_zipcode_lao C ON B.location_id = C.id LEFT JOIN app_group_users D ON D.users_id = A.user_id LEFT JOIN app_group E ON E.group_id = D.group_id where A.user_id = ?",
+    [data.user_id]
+  );
+
+  let sql = "select * from app_zipcode_lao where id = ?";
+
+  let _check_user_pro = await runQuery(
+    "select * from app_zipcode_lao where id = ?",
+    [_check_user[0].location_id]
+  );
+  
+  let sqlgroup = "select * from app_group where province_code = ?";
+ let results = await runQuery(sqlgroup,_check_user_pro[0].province_code);
+  const result = {
+    data: results, // รายการข้อมูล
+  };
+  return res.json(result);
+
+});
+
+
 router.post("/contry", middleware, (req, res, next) => {
   const data = req.body;
   const current_page = data.page;
