@@ -612,6 +612,7 @@ router.get("/event/newlist", middleware, async (req, res, next) => {
   const present_day = new Date().toISOString().split("T")[0];
   const ap_date_first = new Date().toISOString().split("T")[0];
 
+  const last_day = new Date(Date.now()+14*24*60*60*1000).toISOString().split("T")[0];
 
   con.query(
     "SELECT A.ap_id,A.ap_quota,A.ap_date_first,B.dlt_code,A.time,IFNULL(E.order_count, 0) AS available,F.province_code,F.province_name,A.group_id,G.name from app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id LEFT JOIN (select ap_id,dlt_code,COUNT(*) AS order_count  from app_appointment_reserve o GROUP BY o.ap_id,o.dlt_code) E ON A.ap_id = E.ap_id AND B.dlt_code = E.dlt_code LEFT JOIN app_group G ON G.group_id = A.group_id LEFT JOIN app_zipcode_lao F ON G.province_code = F.province_code where B.dlt_code = ? AND A.ap_date_first >= ? and A.ap_date_first <= ? GROUP BY A.ap_id",
