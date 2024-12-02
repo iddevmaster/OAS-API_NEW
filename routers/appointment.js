@@ -735,7 +735,6 @@ _check_reserve = getMyReserve.length;
 if (_check_reserve >= 1) {
   _check_reserveIn = getMyInReserve;
 
-  
 
   const datainarray = await functions.Arrayall(getMyReserve,_check_reserveIn);
 
@@ -789,7 +788,6 @@ if(checkdup == false){
 
 if (_check_reserve == 0) {
  
-
 
   let getMyInReserve = await runQuery(
     "SELECT * FROM app_appointment A LEFT JOIN app_appointment_type B ON A.ap_id = B.ap_id where A.ap_id = ? And B.dlt_code = ?",
