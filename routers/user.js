@@ -15,6 +15,14 @@ async function runQuery(sql, param) {
   });
 }
 
+function asyncOperation() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve('Done!'), 1000);
+  });
+}
+
+
+
 router.post("/list?", middleware, async (req, res, next) => {
   const data = req.body;
 
@@ -1911,6 +1919,89 @@ router.post("/createuserpopulation", middleware, async (req, res, next) => {
     .catch((err) => console.error(err.message));
 });
 
+
+router.post("/noticationnews", middleware, async (req, res, next) => {
+  const data = req.body;
+  const user_id = data.user_id;
+
+  let sql = `select * from app_news ORDER BY crt_date DESC LIMIT 1`;
+  let resultsx = await runQuery(sql);
+
+  con.query(
+    "SELECT user_id FROM app_user where user_type = 3 AND cancelled = 1",
+    (err, rows) => {
+      let checkuser = rows.length;
+      for (let i = 0; i < rows.length; i++) {
+    
+const user = rows[i].user_id;
+const news_id = resultsx[0].news_id;
+const message = resultsx[0].news_title;
+
+if(user){
+  let sqss = 'select COUNT(*) as numRows from app_user_notifications where user_id = ?';
+  runQuery(sqss,user).then((result) => {
+    if(result[0]?.numRows == 0){
+      let result = runQuery(
+        "INSERT INTO app_user_notifications (type_notication,message,custer_id,user_id,crt_date,upd_date) VALUES (?,?,?,?,?,?)",
+        [2,message,news_id,user,functions.dateAsiaThai(),functions.dateAsiaThai()]
+      )
+    }
+  });
+}
+      
+      }
+
+      return res.json(200);
+    }
+  );
+
+});
+
+router.post("/noticationdlt", middleware, async (req, res, next) => {
+  const data = req.body;
+  const user_id = data.user_id;
+
+  let resultsx = await runQuery(
+    "select COUNT(*) as numRows from app_dlt_card A LEFT JOIN app_dlt_card_type B ON A.id = B.dlt_card_id where A.user_id = ? AND A.status = 'Y'",
+    [user_id]
+  );
+
+  if(resultsx[0]?.numRows > 0){
+
+    let checkex = await runQuery(
+      "select A.id,A.issue_date,A.expiry_date,GROUP_CONCAT(B.dlt_code ORDER BY B.dlt_code SEPARATOR '/') AS dlt,A.status,A.user_id from app_dlt_card A LEFT JOIN app_dlt_card_type B ON A.id = B.dlt_card_id where A.user_id = ?",
+      [user_id]
+    );
+
+    Date.prototype.addDays = function (days) {
+      var date = new Date(this.valueOf());
+      date.setDate(date.getDate() + days);
+      return date;
+    };
+
+  
+    const check_start = new Date(checkex[0].expiry_date).getTime();
+    const date = new Date(checkex[0].expiry_date);
+    const end = date.addDays(-30).toISOString().split("T")[0];
+    const check_start2 = new Date(end).getTime();
+
+    const dates = new Date().getTime();
+
+    console.log('เวลา ในระบบ',check_start);
+    console.log('เวลา - 30 วัน',check_start2);
+    console.log('เวลา ปัจจบัน',dates);
+    if(dates > check_start2){
+    
+      let result = await runQuery(
+        "INSERT INTO app_user_notifications (type_notication,message,custer_id,user_id,crt_date,upd_date) VALUES (?,?,?,?,?,?)",
+        [1,'ໃບຂັບຂີ່ປະເພດ AB ຂອງທ່ານຈະໝົດອາຍຸ ໃນວັນທີ 30/04/2024',checkex[0].id,data.user_id,functions.dateAsiaThai(),functions.dateAsiaThai()]
+      )
+      return res.json(result);
+    }
+    /////////////เช็คว่า ถึึง เวลารึยัง/////
+  }
+
+});
 
 
 module.exports = router;
