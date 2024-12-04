@@ -1027,7 +1027,7 @@ router.put("/update/renew/:user_id", middleware, async (req, res, next) => {
       })
       .catch((err) => console.error(err.message));
   } else {
-    console.log('if2 user_password')
+   
     con.query(
       "UPDATE app_user A JOIN app_user_detail B ON B.user_id = A.user_id SET A.user_type=? ,A.active=? ,A.user_name=? ,A.user_prefrix=?, A.user_full_name=? ,A.user_firstname=? ,A.user_lastname=? ,B.user_birthday=? ,A.user_email=? ,A.user_phone=?, A.udp_date=?,A.user_email =?,B.verify_account =? ,B.exp_date =? ,B.passpost_image =? ,B.real_image =?, B.user_address =?, B.user_village =?  WHERE A.user_id=? ",
       [
@@ -1938,7 +1938,7 @@ const news_id = resultsx[0].news_id;
 const message = resultsx[0].news_title;
 
 if(user){
-  let sqss = 'select COUNT(*) as numRows from app_user_notifications where user_id = ?';
+  let sqss = 'select COUNT(*) as numRows from app_user_notifications where user_id = ? AND type_notication = 2 ';
   runQuery(sqss,user).then((result) => {
     if(result[0]?.numRows == 0){
       let result = runQuery(
@@ -1956,6 +1956,26 @@ if(user){
   );
 
 });
+
+router.get("/noticationdlt", middleware, async (req, res, next) => {
+  let user_id = req.query.user_id;
+  let alertdlt = await runQuery(
+    "select * from app_user_notifications where user_id = ? AND type_notication = 1 order by crt_date DESC",
+    [user_id]
+  );
+  let alertnew = await runQuery(
+    "select * from app_user_notifications where user_id = ? AND type_notication = 2 order by crt_date DESC",
+    [user_id]
+  );
+
+  const response = {
+    dlt: alertdlt,
+    news: alertnew,
+  };
+ 
+  return res.json(response);
+});
+
 
 router.post("/noticationdlt", middleware, async (req, res, next) => {
   const data = req.body;
@@ -1987,21 +2007,34 @@ router.post("/noticationdlt", middleware, async (req, res, next) => {
 
     const dates = new Date().getTime();
 
-    console.log('เวลา ในระบบ',check_start);
-    console.log('เวลา - 30 วัน',check_start2);
-    console.log('เวลา ปัจจบัน',dates);
     if(dates > check_start2){
-    
-      let result = await runQuery(
-        "INSERT INTO app_user_notifications (type_notication,message,custer_id,user_id,crt_date,upd_date) VALUES (?,?,?,?,?,?)",
-        [1,'ໃບຂັບຂີ່ປະເພດ AB ຂອງທ່ານຈະໝົດອາຍຸ ໃນວັນທີ 30/04/2024',checkex[0].id,data.user_id,functions.dateAsiaThai(),functions.dateAsiaThai()]
-      )
-      return res.json(result);
+
+      ///////////////// เช็คก่อนว่า Insert ลงรึยัง //////////
+
+
+      let datatotal = await runQuery(
+        "select COUNT(*) as totals from app_user_notifications A where A.custer_id = ? AND type_notication = 1",
+        [checkex[0].id]
+      );
+
+      if(datatotal[0].totals > 0){
+        result = [];
+        return res.json(result);
+      }else {
+        let result = await runQuery(
+          "INSERT INTO app_user_notifications (type_notication,message,custer_id,user_id,crt_date,upd_date) VALUES (?,?,?,?,?,?)",
+          [1,'ໃບຂັບຂີ່ປະເພດ '+checkex[0].dlt+' ຂອງທ່ານຈະໝົດອາຍຸ ໃນວັນທີ '+checkex[0].expiry_date,checkex[0].id,data.user_id,functions.dateAsiaThai(),functions.dateAsiaThai()]
+        )
+        return res.json(result);
+      }
+     
+      
     }
     /////////////เช็คว่า ถึึง เวลารึยัง/////
   }
 
 });
+
 
 
 module.exports = router;
