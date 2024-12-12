@@ -1095,7 +1095,7 @@ LEFT JOIN app_user_detail D ON C.user_id = D.user_id
 LEFT JOIN app_zipcode_lao E ON E.id = D.location_id
 WHERE DATE(B.ap_date_first) = ?
     `;
-    let getContent = await runQuery(sql,[ap_date_start,group]);
+    let getContent = await runQuery(sql,[ap_date_start]);
 
       return res.json(getContent);
     
