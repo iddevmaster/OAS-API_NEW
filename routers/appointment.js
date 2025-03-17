@@ -139,12 +139,12 @@ let _check_user = await runQuery(
 
       let results = await runQuery(sqlx,data.group_id);
       
+      console.log(results);
       
-      console.log(data.group_id);
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id,day,peop_addrs) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,group_id,LoaDay.days,peop_addrs]
+        [2, data.ap_quota,data.ap_date_start,data.ap_date_end,currentDate.toISOString().split('T')[0],'-','-',functions.dateAsiaThai(),functions.dateAsiaThai(), user_id,user_id,time,group_id,LoaDay.days,results[0].province_name]
         
       )
       let ap_id = result.insertId;
