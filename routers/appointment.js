@@ -139,7 +139,7 @@ let _check_user = await runQuery(
 
       let results = await runQuery(sqlx,data.group_id);
       
-      console.log(results);
+      
       console.log(data.group_id);
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
