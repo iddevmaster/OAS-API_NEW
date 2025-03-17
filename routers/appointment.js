@@ -135,12 +135,12 @@ let _check_user = await runQuery(
         [currentDate.toISOString().split('T')[0],group_id]
       );
 
-      let sqlx = "SELECT A.group_id,A.group,A.users_id,B.name,B.province_code,C.province_name FROM app_group_users A LEFT JOIN app_group B ON A.group = B.group_id LEFT JOIN app_zipcode_lao C ON C.province_code = B.province_code WHERE A.users_id = ? GROUP BY A.group_id,A.users_id";
+      let sqlx = "SELECT A.group_id,A.group,A.users_id,B.name,B.province_code,C.province_name FROM app_group_users A LEFT JOIN app_group B ON A.group = B.group_id LEFT JOIN app_zipcode_lao C ON C.province_code = B.province_code WHERE A.group_id = ? GROUP BY A.group_id,A.users_id";
 
-      let results = await runQuery(sqlx,data.user_id);
+      let results = await runQuery(sqlx,data.group_id);
       
       console.log(results);
-      console.log(data.user_id);
+      console.log(data.group_id);
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id,day,peop_addrs) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
