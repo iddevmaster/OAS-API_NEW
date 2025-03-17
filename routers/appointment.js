@@ -140,6 +140,7 @@ let _check_user = await runQuery(
       let results = await runQuery(sqlx,data.user_id);
       
       console.log(results);
+      console.log(data.user_id);
       if(getContent[0]?.numRows == 0){
         let result = await runQuery(
         "INSERT INTO app_appointment (ap_learn_type,ap_quota,ap_date_start,ap_date_end,ap_date_first,ap_remark,dlt_code,crt_date,udp_date,user_udp,user_crt,time,group_id,day,peop_addrs) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
