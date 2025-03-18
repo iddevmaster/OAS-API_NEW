@@ -1205,6 +1205,20 @@ router.post("/dateappointment/appbyuser", middleware, async (req, res, next) => 
   
     });
 
+
+    router.get("/reserve/data/:ap_id", middleware, async(req, res, next) => {
+      const { ap_id } = req.params;
+    
+      let getContent = await runQuery(
+        "SELECT *,A.dlt_code As dlt_types,C.day as today,C.peop_addrs as address from app_appointment_reserve A LEFT JOIN app_user B ON A.user_id = B.user_id LEFT JOIN app_appointment C ON C.ap_id = A.ap_id LEFT JOIN app_user_detail D ON D.user_id = A.user_id LEFT JOIN app_zipcode_lao E ON D.location_id = E.id LEFT JOIN app_country F ON D.country_id = F.country_id WHERE A.ap_number =? LIMIT 1",
+        [ap_id]
+      );
+      const response = getContent;
+      return res.json(response);
+
+
+    });
+
 //
 
 module.exports = router;
